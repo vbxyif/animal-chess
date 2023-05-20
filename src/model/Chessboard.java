@@ -1,7 +1,6 @@
 package model;
 
 import view.ChessComponent.Name;
-import view.ChessGameFrame;
 import view.ChessboardComponent;
 
 import java.util.HashSet;
@@ -88,7 +87,7 @@ public class Chessboard {
     private boolean isRiverNoRat(ChessboardPoint src, ChessboardPoint dest) {
         int x = dest.col() - src.col();
         int y = dest.row() - src.row();
-        if (!(x != 0 && y != 0) && (x == 0 && y == 0)) {
+        if (!(x != 0 && y != 0) && !(x == 0 && y == 0)) {
             int d = x != 0 ? x / Math.abs(x) : y / Math.abs(y);
             for (int i = 0; i < Math.abs(x); i++) {
                 ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
@@ -109,19 +108,17 @@ public class Chessboard {
     }
 
     private boolean isRiver(ChessboardPoint dest) {
-        boolean contains = getChessboardComponent().getRiverCell().contains(dest);
-        return contains;
+        return getChessboardComponent().getRiverCell().contains(dest);
     }
 
     private boolean isNext(ChessboardPoint src, ChessboardPoint dest) {
-        boolean contains = calculateDistance(src, dest) == 1;
-        return contains;
+        return calculateDistance(src, dest) == 1;
     }
 
     private boolean isMiddleRiver(ChessboardPoint src, ChessboardPoint dest) {
         int x = dest.col() - src.col();
         int y = dest.row() - src.row();
-        if (!(x != 0 && y != 0) && (x == 0 && y == 0)) {
+        if (!(x != 0 && y != 0) && !(x == 0 && y == 0)) {
             int d = x != 0 ? x / Math.abs(x) : y / Math.abs(y);
             for (int i = 0; i < Math.abs(x); i++) {
                 ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
@@ -141,14 +138,12 @@ public class Chessboard {
 
     private boolean canIn(ChessboardPoint src, ChessboardPoint dest) {
         int rank = getChessPieceAt(src).getRank();
-        boolean contains = rank == 1 && isNext(src, dest) && isRiver(dest);
-        return contains;
+        return rank == 1 && isNext(src, dest) && isRiver(dest);
     }
 
     private boolean canJump(ChessboardPoint src, ChessboardPoint dest) {
         int rank = getChessPieceAt(src).getRank();
-        boolean contains = (rank == 6 || rank == 7) && isMiddleRiver(src, dest) && isRiverNoRat(src, dest);
-        return contains;
+        return (rank == 6 || rank == 7) && isMiddleRiver(src, dest) && isRiverNoRat(src, dest);
     }
 
     private boolean isPartner(ChessboardPoint src, ChessboardPoint dest) {
@@ -224,8 +219,7 @@ public class Chessboard {
         if (getChessPieceAt(dest) == null) {
             return true;
         } else {
-            boolean canCapture = getChessPieceAt(src).canCapture(getChessPieceAt(dest));
-            return canCapture;
+            return getChessPieceAt(src).canCapture(getChessPieceAt(dest));
         }
     }
 }
