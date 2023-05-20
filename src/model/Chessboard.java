@@ -57,13 +57,22 @@ public class Chessboard {
     private void initTeam() {
         for (int i = 0; i < Constant.CHESSBOARD_ROW_SIZE.getNum(); i++) {
             for (int j = 0; j < Constant.CHESSBOARD_COL_SIZE.getNum(); j++) {
-                if (i < 3) {
-                    red.add(getChessPieceAt(new ChessboardPoint(i, j)));
-                } else if (i > 5) {
-                    blue.add(getChessPieceAt(new ChessboardPoint(i, j)));
+                ChessboardPoint point = new ChessboardPoint(i, j);
+                if (i < 3 && getChessPieceAt(point) != null) {
+                    red.add(getChessPieceAt(point));
+                } else if (i > 5 && getChessPieceAt(point) != null) {
+                    blue.add(getChessPieceAt(point));
                 }
             }
         }
+    }
+
+    public Set<ChessPiece> getRed() {
+        return red;
+    }
+
+    public Set<ChessPiece> getBlue() {
+        return blue;
     }
 
     private ChessPiece getChessPieceAt(ChessboardPoint point) {

@@ -42,7 +42,7 @@ public class ChessComponent extends JComponent {
         //g2.setColor(owner.getColor());
         String name = this.name.toString();
         String color = this.owner.toString();
-        Image image = new ImageIcon(String.format("C:/Users/Admin/Desktop/笔记本/Java作业/CS109-2023-Sping-ChessDemo (1)/src/animals/%s%s.png", name, color)).getImage();
+        Image image = new ImageIcon(String.format("src/animals/%s%s.png", name, color)).getImage();
         g2.drawImage(image, getWidth() / 6, getHeight() / 6, this);
         // FIXME: Use library to find the correct offset.--Done
         if (isSelected()) { // Highlights the model if selected.

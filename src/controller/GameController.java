@@ -64,22 +64,19 @@ public class GameController implements GameListener {
         return roundText;
     }
 
-    private boolean win(boolean value) {
+    private boolean win(ChessboardPoint point) {
         // TODO: Check the board if there is a winner--Done
+        boolean value = point.equals(ChessboardComponent.getDenRed()) || point.equals(ChessboardComponent.getDenBlue())
+                || model.getBlue().isEmpty() || model.getRed().isEmpty();
         if (value) {
-            afterWin();
+            System.out.println("游戏结束！");
+            //JOptionPane.showMessageDialog(null,"游戏结束！");
+            roundText.setFont(new Font("Black", Font.BOLD, 100));
+            roundText.setText("Win!");
+            view.disableEvents();;
         }
         return value;
     }
-
-    private void afterWin() {
-        System.out.println("游戏结束！");
-        //JOptionPane.showMessageDialog(null,"游戏结束！");
-        roundText.setFont(new Font("Black", Font.BOLD, 100));
-        roundText.setText("Win!");
-        view.disableEvents();
-    }
-
     // click an empty cell
     @Override
     public void onPlayerClickCell(ChessboardPoint point, CellComponent component) {
@@ -93,11 +90,10 @@ public class GameController implements GameListener {
                 }
             }
             view.repaint();
-            boolean value = point.equals(ChessboardComponent.getDenRed()) || point.equals(ChessboardComponent.getDenBlue());
-            if (!win(value)) {
+            if (!win(point)) {
                 swapColor();
             } else {
-                win(true);
+                win(point);
             }
             // TODO: if the chess enter Dens or Traps and so on--Done
         }
@@ -115,7 +111,6 @@ public class GameController implements GameListener {
                         ChessboardPoint point1 = new ChessboardPoint(i, j);
                         if (model.isValidMove(point, point1) || model.isValidCapture(point, point1)) {
                             view.getGridComponentAt(point1).setValidMove(true);
-                            //view.getGridComponentAt(point1).repaint();
                         }
                     }
                 }
@@ -143,11 +138,10 @@ public class GameController implements GameListener {
                     }
                 }
                 view.repaint();
-                boolean value = point.equals(ChessboardComponent.getDenRed()) || point.equals(ChessboardComponent.getDenBlue());
-                if (!win(value)) {
+                if (!win(point)) {
                     swapColor();
                 } else {
-                    win(true);
+                    win(point);
                 }
             }
         }

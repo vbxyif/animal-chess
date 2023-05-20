@@ -28,6 +28,8 @@ public class ChessPiece {
             this.isCatch = true;
         } else if (this.getOwner().equals(PlayerColor.BLUE) && ChessGameFrame.getChessboardComponent().getTrapRed().contains(point)) {
             this.isCatch = true;
+        } else {
+            this.isCatch = false;
         }
     }
 
