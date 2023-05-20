@@ -9,7 +9,6 @@ import java.awt.*;
 public class BeginFrame extends JFrame {
     public final int WIDTH;
     public final int HEIGHT;
-
     public BeginFrame(int WIDTH, int HEIGHT) {
         this.WIDTH = WIDTH;
         this.HEIGHT = HEIGHT;
@@ -17,7 +16,7 @@ public class BeginFrame extends JFrame {
         setSize(this.WIDTH, this.HEIGHT);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setLayout(null);
+        setLayout(new GridBagLayout());
 
         addTittleLabel();
         addBeginButton();
@@ -25,8 +24,13 @@ public class BeginFrame extends JFrame {
 
     public void addTittleLabel() {
         JLabel tittleLabel = new JLabel(new ImageIcon("C:\\Users\\Admin\\Desktop\\笔记本\\Java作业\\CS109-2023-Sping-ChessDemo (1)\\resource\\logo.png"), JLabel.CENTER);
-        tittleLabel.setSize(WIDTH, HEIGHT);
-        add(tittleLabel);
+        //tittleLabel.setSize(WIDTH, HEIGHT);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        /*this.getLayeredPane().setLayout(new GridBagLayout());
+        this.getLayeredPane().add(tittleLabel, constraints, JLayeredPane.DEFAULT_LAYER);*/
+        add(tittleLabel, constraints);
     }
 
     public void addBeginButton() {
@@ -38,8 +42,12 @@ public class BeginFrame extends JFrame {
             mainFrame.addRoundText(gameController.getRoundText());
             mainFrame.setVisible(true);
         });
-        beginButton.setSize(200, 60);
-        beginButton.setLocation((WIDTH - 200) / 2, HEIGHT / 2);
-        add(beginButton);
+        //beginButton.setSize(200, 60);
+        beginButton.setFont(new Font("Black", Font.BOLD, 30));
+        //beginButton.setLocation((WIDTH - 200) / 2, HEIGHT / 2);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        add(beginButton, constraints);
     }
 }

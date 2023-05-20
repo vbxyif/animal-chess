@@ -8,6 +8,5 @@ public class Main {
             BeginFrame beginFrame = new BeginFrame(1100, 800);
             beginFrame.setVisible(true);
         });
-        /**/
     }
 }
