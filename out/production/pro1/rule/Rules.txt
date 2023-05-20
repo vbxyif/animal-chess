@@ -9,7 +9,7 @@
      Moving one square horizontally or vertically. For lion, tiger and rat, they also have special
     movements related to the river squares, which have been introduced previously.
      Capturing an opposing piece. In all captures, the captured pieces is removed from the board
-    and the square is occupied by the capturing piece. A piece can capture any enemy piece
+    and the square are occupied by the capturing piece. A piece can capture any enemy piece
     following the rules introduced in "Pieces".
 
     3. Game Termination: A player loses the game if one of the following happens:

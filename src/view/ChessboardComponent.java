@@ -25,8 +25,7 @@ public class ChessboardComponent extends JComponent {
     private final CellComponent[][] gridComponents = new CellComponent[CHESSBOARD_ROW_SIZE.getNum()][CHESSBOARD_COL_SIZE.getNum()];
     private final int CHESS_SIZE;
     private final Set<ChessboardPoint> riverCell = new HashSet<>();
-    private final Set<ChessboardPoint> river1sideCell = new HashSet<>();
-    private final Set<ChessboardPoint> river2sideCell = new HashSet<>();
+    private final Set<ChessboardPoint> riversideCell = new HashSet<>();
     private final Set<ChessboardPoint> trapRed = new HashSet<>();
     private final Set<ChessboardPoint> trapBlue = new HashSet<>();
     private GameController gameController;
@@ -74,12 +73,8 @@ public class ChessboardComponent extends JComponent {
 
     }
 
-    public Set<ChessboardPoint> getRiver1sideCell() {
-        return river1sideCell;
-    }
-
-    public Set<ChessboardPoint> getRiver2sideCell() {
-        return river2sideCell;
+    public Set<ChessboardPoint> getRiversideCell() {
+        return riversideCell;
     }
 
     public Set<ChessboardPoint> getTrapRed() {
@@ -112,16 +107,16 @@ public class ChessboardComponent extends JComponent {
             riverCell.add(new ChessboardPoint(5, 1));
             riverCell.add(new ChessboardPoint(5, 2));
 
-            river1sideCell.add(new ChessboardPoint(2, 1));
-            river1sideCell.add(new ChessboardPoint(2, 2));
-            river1sideCell.add(new ChessboardPoint(3, 0));
-            river1sideCell.add(new ChessboardPoint(3, 3));
-            river1sideCell.add(new ChessboardPoint(4, 0));
-            river1sideCell.add(new ChessboardPoint(4, 3));
-            river1sideCell.add(new ChessboardPoint(5, 0));
-            river1sideCell.add(new ChessboardPoint(5, 3));
-            river1sideCell.add(new ChessboardPoint(6, 1));
-            river1sideCell.add(new ChessboardPoint(6, 2));
+            riversideCell.add(new ChessboardPoint(2, 1));
+            riversideCell.add(new ChessboardPoint(2, 2));
+            riversideCell.add(new ChessboardPoint(3, 0));
+            riversideCell.add(new ChessboardPoint(3, 3));
+            riversideCell.add(new ChessboardPoint(4, 0));
+            riversideCell.add(new ChessboardPoint(4, 3));
+            riversideCell.add(new ChessboardPoint(5, 0));
+            riversideCell.add(new ChessboardPoint(5, 3));
+            riversideCell.add(new ChessboardPoint(6, 1));
+            riversideCell.add(new ChessboardPoint(6, 2));
 
             riverCell.add(new ChessboardPoint(3, 4));
             riverCell.add(new ChessboardPoint(3, 5));
@@ -130,16 +125,16 @@ public class ChessboardComponent extends JComponent {
             riverCell.add(new ChessboardPoint(5, 4));
             riverCell.add(new ChessboardPoint(5, 5));
 
-            river2sideCell.add(new ChessboardPoint(2, 4));
-            river2sideCell.add(new ChessboardPoint(2, 5));
-            river2sideCell.add(new ChessboardPoint(3, 3));
-            river2sideCell.add(new ChessboardPoint(3, 6));
-            river2sideCell.add(new ChessboardPoint(4, 3));
-            river2sideCell.add(new ChessboardPoint(4, 6));
-            river2sideCell.add(new ChessboardPoint(5, 3));
-            river2sideCell.add(new ChessboardPoint(5, 6));
-            river2sideCell.add(new ChessboardPoint(6, 4));
-            river2sideCell.add(new ChessboardPoint(6, 5));
+            riversideCell.add(new ChessboardPoint(2, 4));
+            riversideCell.add(new ChessboardPoint(2, 5));
+            riversideCell.add(new ChessboardPoint(3, 3));
+            riversideCell.add(new ChessboardPoint(3, 6));
+            riversideCell.add(new ChessboardPoint(4, 3));
+            riversideCell.add(new ChessboardPoint(4, 6));
+            riversideCell.add(new ChessboardPoint(5, 3));
+            riversideCell.add(new ChessboardPoint(5, 6));
+            riversideCell.add(new ChessboardPoint(6, 4));
+            riversideCell.add(new ChessboardPoint(6, 5));
         }//set river, traps and dens
 
         for (int i = 0; i < CHESSBOARD_ROW_SIZE.getNum(); i++) {
@@ -149,7 +144,7 @@ public class ChessboardComponent extends JComponent {
                 if (riverCell.contains(temp)) {
                     cell = new CellComponent(Color.CYAN, calculatePoint(i, j), CHESS_SIZE, "river");
                     this.add(cell);
-                } else if (river1sideCell.contains(temp) || river2sideCell.contains(temp)) {
+                } else if (riversideCell.contains(temp) || riversideCell.contains(temp)) {
                     cell = new CellComponent(new Color(46, 80, 44), calculatePoint(i, j), CHESS_SIZE, "riverside");
                     this.add(cell);
                 } else if (trapRed.contains(temp) || trapBlue.contains(temp)) {
@@ -189,7 +184,7 @@ public class ChessboardComponent extends JComponent {
     }
 
     public CellComponent getGridComponentAt(ChessboardPoint point) {
-        return gridComponents[point.getRow()][point.getCol()];
+        return gridComponents[point.row()][point.col()];
     }
 
     private ChessboardPoint getChessboardPoint(Point point) {

@@ -12,7 +12,7 @@ import java.awt.*;
  */
 public class ChessComponent extends JComponent {
     private final Name name;
-    private PlayerColor owner;
+    private final PlayerColor owner;
     private boolean selected;
 
     public ChessComponent(Name name, PlayerColor owner, int size) {
@@ -37,9 +37,6 @@ public class ChessComponent extends JComponent {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        //Font = new Font("楷体", Font.PLAIN, getWidth() / 2);
-        //g2.setFont(font);
-        //g2.setColor(owner.getColor());
         String name = this.name.toString();
         String color = this.owner.toString();
         Image image = new ImageIcon(String.format("src/animals/%s%s.png", name, color)).getImage();

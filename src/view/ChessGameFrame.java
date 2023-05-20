@@ -65,13 +65,6 @@ public class ChessGameFrame extends JFrame {
     /**
      * 在游戏面板中添加标签
      */
-    /*private void addLabel() {
-        JLabel statusLabel = new JLabel();
-        statusLabel.setLocation(HEIGTH, HEIGTH / 10);
-        statusLabel.setSize(200, 60);
-        statusLabel.setFont(new Font("Rockwell", Font.BOLD, 40));
-        this.getLayeredPane().add(statusLabel,JLayeredPane.MODAL_LAYER);
-    }*/
     public void addRoundText(MessageText roundText) {
         roundText.setOpaque(false);
         roundText.setBorder(null);
@@ -132,19 +125,6 @@ public class ChessGameFrame extends JFrame {
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
         this.getLayeredPane().add(button, JLayeredPane.MODAL_LAYER);
     }
-    //private void addLoadButton() {
-    //JButton button = new JButton("Load");
-    //button.setLocation(HEIGTH, HEIGTH / 10 + 240);
-    //button.setSize(200, 60);
-    //button.setFont(new Font("Rockwell", Font.BOLD, 20));
-    //add(button);
-    //
-    //button.addActionListener(e -> {
-    //System.out.println("Click load");
-    // String path = JOptionPane.showInputDialog(this,"Input Path here");
-    // gameController.loadGameFromFile(path);
-    //  });
-    //}
 
 
 }

@@ -26,17 +26,14 @@ public class ChessPiece {
     public void fallInTrap(ChessboardPoint point) {
         if (this.getOwner().equals(PlayerColor.RED) && ChessGameFrame.getChessboardComponent().getTrapBlue().contains(point)) {
             this.isCatch = true;
-        } else if (this.getOwner().equals(PlayerColor.BLUE) && ChessGameFrame.getChessboardComponent().getTrapRed().contains(point)) {
-            this.isCatch = true;
-        } else {
-            this.isCatch = false;
-        }
+        } else
+            this.isCatch = this.getOwner().equals(PlayerColor.BLUE) && ChessGameFrame.getChessboardComponent().getTrapRed().contains(point);
     }
 
     public void inWater(ChessboardPoint point) {
         if (ChessGameFrame.getChessboardComponent().getRiverCell().contains(point)) {
             this.inWater = true;
-        }
+        } else this.inWater = false;
     }
 
     public boolean canCapture(ChessPiece target) {

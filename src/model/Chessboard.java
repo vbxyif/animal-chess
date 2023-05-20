@@ -7,6 +7,8 @@ import view.ChessboardComponent;
 import java.util.HashSet;
 import java.util.Set;
 
+import static view.ChessGameFrame.getChessboardComponent;
+
 
 /**
  * This class store the real chess information.
@@ -80,18 +82,25 @@ public class Chessboard {
     }
 
     private Cell getGridAt(ChessboardPoint point) {
-        return grid[point.getRow()][point.getCol()];
+        return grid[point.row()][point.col()];
     }
 
-    public boolean isNoRiverHasRat(ChessboardPoint src, ChessboardPoint dest) {
-        int rowDistance = dest.getRow() - src.getRow();
-        int colDistance = dest.getCol() - src.getCol();
-        int rowMuti = rowDistance / (Math.abs(rowDistance) != 0 ? Math.abs(rowDistance) : 1);
-        int colMuti = colDistance / (Math.abs(colDistance) != 0 ? Math.abs(colDistance) : 1);
-        for (int i = 0; i < Math.abs(rowDistance); i++) {
-            for (int j = 0; j < Math.abs(colDistance); j++) {
-                ChessboardPoint point = new ChessboardPoint(src.getRow() + rowMuti * i, src.getCol() + colMuti * j);
-                if (getChessPieceAt(point) != null && getChessPieceAt(point).getName().equals(Name.鼠)) {
+    private boolean isRiverNoRat(ChessboardPoint src, ChessboardPoint dest) {
+        int x = dest.col() - src.col();
+        int y = dest.row() - src.row();
+        if (!(x != 0 && y != 0) && (x == 0 && y == 0)) {
+            int d = x != 0 ? x / Math.abs(x) : y / Math.abs(y);
+            for (int i = 0; i < Math.abs(x); i++) {
+                ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
+                ChessPiece chess = getChessPieceAt(point);
+                if (chess.getName().equals(Name.鼠)) {
+                    return false;
+                }
+            }
+            for (int i = 0; i < Math.abs(y); i++) {
+                ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
+                ChessPiece chess = getChessPieceAt(point);
+                if (chess.getName().equals(Name.鼠)) {
                     return false;
                 }
             }
@@ -99,8 +108,67 @@ public class Chessboard {
         return true;
     }
 
+    private boolean isRiver(ChessboardPoint dest) {
+        boolean contains = getChessboardComponent().getRiverCell().contains(dest);
+        return contains;
+    }
+
+    private boolean isNext(ChessboardPoint src, ChessboardPoint dest) {
+        boolean contains = calculateDistance(src, dest) == 1;
+        return contains;
+    }
+
+    private boolean isMiddleRiver(ChessboardPoint src, ChessboardPoint dest) {
+        int x = dest.col() - src.col();
+        int y = dest.row() - src.row();
+        if (!(x != 0 && y != 0) && (x == 0 && y == 0)) {
+            int d = x != 0 ? x / Math.abs(x) : y / Math.abs(y);
+            for (int i = 0; i < Math.abs(x); i++) {
+                ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
+                if (!isRiver(point)) {
+                    return false;
+                }
+            }
+            for (int i = 0; i < Math.abs(y); i++) {
+                ChessboardPoint point = new ChessboardPoint(src.row() + d * i, src.col());
+                if (!isRiver(point)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean canIn(ChessboardPoint src, ChessboardPoint dest) {
+        int rank = getChessPieceAt(src).getRank();
+        boolean contains = rank == 1 && isNext(src, dest) && isRiver(dest);
+        return contains;
+    }
+
+    private boolean canJump(ChessboardPoint src, ChessboardPoint dest) {
+        int rank = getChessPieceAt(src).getRank();
+        boolean contains = (rank == 6 || rank == 7) && isMiddleRiver(src, dest) && isRiverNoRat(src, dest);
+        return contains;
+    }
+
+    private boolean isPartner(ChessboardPoint src, ChessboardPoint dest) {
+        if (getChessPieceAt(src) != null && getChessPieceAt(dest) != null) {
+            PlayerColor self = getChessPieceOwner(src);
+            PlayerColor target = getChessPieceOwner(dest);
+            return self.equals(target);
+        }
+        return false;
+    }
+
+    private boolean isHomeDen(ChessboardPoint src, ChessboardPoint dest) {
+        PlayerColor self = getChessPieceOwner(src);
+        if (self.equals(PlayerColor.RED) && dest.equals(ChessboardComponent.getDenRed())) {
+            return true;
+        } else return self.equals(PlayerColor.BLUE) && dest.equals(ChessboardComponent.getDenBlue());
+    }
+
     private double calculateDistance(ChessboardPoint src, ChessboardPoint dest) {
-        return Math.sqrt(Math.pow(Math.abs(src.getRow() - dest.getRow()), 2) + Math.pow(Math.abs(src.getCol() - dest.getCol()), 2));
+        return Math.sqrt(Math.pow(Math.abs(src.row() - dest.row()), 2) + Math.pow(Math.abs(src.col() - dest.col()), 2));
     }
 
     private ChessPiece removeChessPiece(ChessboardPoint point) {
@@ -142,49 +210,22 @@ public class Chessboard {
     }
 
     public boolean isValidMove(ChessboardPoint src, ChessboardPoint dest) {
-        boolean isRiver = ChessGameFrame.getChessboardComponent().getRiverCell().contains(dest);
-        boolean isRiver1side = ChessGameFrame.getChessboardComponent().getRiver1sideCell().contains(dest);
-        boolean isRiver2side = ChessGameFrame.getChessboardComponent().getRiver2sideCell().contains(dest);
-        boolean isSelfRiver1side = ChessGameFrame.getChessboardComponent().getRiver1sideCell().contains(src);
-        boolean isSelfRiver2side = ChessGameFrame.getChessboardComponent().getRiver2sideCell().contains(src);
-        boolean canCapture = getChessPieceAt(src) == null || getChessPieceAt(dest) == null || getChessPieceAt(src).canCapture(getChessPieceAt(dest));
-
-        if (getChessPieceAt(src) == null) {
-            return false;
-        } else if (isRiver) {
-            if (getChessPieceAt(src).getRank() != 1) {
-                return false;
-            }
-        } else if (isRiver1side || isRiver2side) {
-            if (getChessPieceAt(src).getRank() == 6 || getChessPieceAt(src).getRank() == 7) {
-                if (isSelfRiver1side && isSelfRiver2side) {
-                    return canCapture && isNoRiverHasRat(src, dest) && (calculateDistance(src, dest) == 3 || calculateDistance(src, dest) == 1);
-                } else {
-                    if (isSelfRiver1side && isRiver1side) {
-                        return canCapture && isNoRiverHasRat(src, dest) && (calculateDistance(src, dest) == 3 || calculateDistance(src, dest) == 4 || calculateDistance(src, dest) == 1);
-                    } else if (isSelfRiver2side && isRiver2side) {
-                        return canCapture && isNoRiverHasRat(src, dest) && (calculateDistance(src, dest) == 3 || calculateDistance(src, dest) == 4 || calculateDistance(src, dest) == 1);
-                    }
-                }
-            }
-        }
-
-        if (getChessPieceAt(dest) != null) {
-            if (getChessPieceOwner(dest).equals(getChessPieceOwner(src))) {
-                return false;
-            }
-        }
-
-        if (getChessPieceAt(src).getOwner().equals(PlayerColor.RED) && dest.equals(ChessboardComponent.getDenRed())
-                || getChessPieceAt(src).getOwner().equals(PlayerColor.BLUE) && dest.equals(ChessboardComponent.getDenBlue())) {
+        if (isPartner(src, dest) || isHomeDen(src, dest)) {
             return false;
         }
-        return canCapture && calculateDistance(src, dest) == 1;
+        if (isRiver(dest)) {
+            return canIn(src, dest);
+        }
+        return canJump(src, dest) || isNext(src, dest);
     }
 
     public boolean isValidCapture(ChessboardPoint src, ChessboardPoint dest) {
         // TODO:Fix this method--Done
-        boolean isInRiver = ChessGameFrame.getChessboardComponent().getRiverCell().contains(src);
-        return !isInRiver && isValidMove(src, dest) && getChessPieceAt(src).canCapture(getChessPieceAt(dest));
+        if (getChessPieceAt(dest) == null) {
+            return true;
+        } else {
+            boolean canCapture = getChessPieceAt(src).canCapture(getChessPieceAt(dest));
+            return canCapture;
+        }
     }
 }

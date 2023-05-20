@@ -73,10 +73,11 @@ public class GameController implements GameListener {
             //JOptionPane.showMessageDialog(null,"游戏结束！");
             roundText.setFont(new Font("Black", Font.BOLD, 100));
             roundText.setText("Win!");
-            view.disableEvents();;
+            view.disableEvents();
         }
         return value;
     }
+
     // click an empty cell
     @Override
     public void onPlayerClickCell(ChessboardPoint point, CellComponent component) {
@@ -109,7 +110,7 @@ public class GameController implements GameListener {
                 for (int i = 0; i < 9; i++) {
                     for (int j = 0; j < 7; j++) {
                         ChessboardPoint point1 = new ChessboardPoint(i, j);
-                        if (model.isValidMove(point, point1) || model.isValidCapture(point, point1)) {
+                        if (model.isValidMove(point, point1) && model.isValidCapture(point, point1)) {
                             view.getGridComponentAt(point1).setValidMove(true);
                         }
                     }
