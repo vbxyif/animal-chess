@@ -1,0 +1,17 @@
+    Rules
+
+    1. Game Initialization: At the beginning, all 16 pieces are put into the chessboard as the initial
+    state. The initial state is shown in Figure 6.
+
+    2. Game Progress: The player with blue moves first. Two players take the turn alternatively until
+    the game is finished. When a player takes turn, he/she can select one of his pieces and do
+    one of the following:
+     Moving one square horizontally or vertically. For lion, tiger and rat, they also have special
+    movements related to the river squares, which have been introduced previously.
+     Capturing an opposing piece. In all captures, the captured pieces is removed from the board
+    and the square is occupied by the capturing piece. A piece can capture any enemy piece
+    following the rules introduced in "Pieces".
+
+    3. Game Termination: A player loses the game if one of the following happens:
+     The den is entered by his/her opponents.
+     All of his/her pieces are captured and he/her is unable to do any movement.
