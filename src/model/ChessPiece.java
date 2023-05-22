@@ -43,10 +43,13 @@ public class ChessPiece {
         if (target.isCatch) {
             targetRank = 0;
         }
+        if (this.isCatch) {
+            thisRank = 0;
+        }
         if (this.inWater) {
             thisRank = 0;
         }
-        if (targetRank == 0 || (thisRank >= targetRank && thisRank - targetRank != 7) || thisRank - targetRank == -7) {
+        if (targetRank == 0 || thisRank >= targetRank || (thisRank == 1 && targetRank == 8)) {
             return !this.getOwner().equals(target.getOwner());
         }
         return false;
