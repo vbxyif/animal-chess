@@ -33,6 +33,7 @@ public class GameController implements GameListener {
     private double round;
     private static int count;
     public static SavesFileWriter savesFileWriter;
+    private static final StringBuilder stringWriter = new StringBuilder();
 
 
     public GameController(ChessboardComponent view, Chessboard model, MessageText roundText) throws IOException {
@@ -42,7 +43,6 @@ public class GameController implements GameListener {
         this.currentPlayer = PlayerColor.BLUE;
 
         view.registerController(this);
-        savesFileWriter = new SavesFileWriter(new File("src/saves/0.txt"));
         //initialize();
         view.initiateChessComponent(model);
         view.repaint();
@@ -56,7 +56,8 @@ public class GameController implements GameListener {
         }
         File newGameFile = new File(String.format("src/saves/save%d.txt", count + 1));
         savesFileWriter = new SavesFileWriter(newGameFile);
-        savesFileWriter.write(savesFileWriter.getTemporaryArchive());
+        savesFileWriter.write(stringWriter.toString());
+        savesFileWriter.close();
         count ++;
     }
 
@@ -100,11 +101,11 @@ public class GameController implements GameListener {
             ChessComponent target = view.removeChessComponentAtGrid(dest);
             model.captureChessPiece(src, dest);
             view.setChessComponentAtGrid(dest, chess);
-            savesFileWriter.teWrite(String.format("%s%s capture %s%s from %s to %s\n", chess.getOwner(), chess.getName(), target.getOwner(), target.getName(), src, dest));
+            stringWriter.append(String.format("%s%s capture %s%s from %s to %s\n", chess.getOwner(), chess.getName(), target.getOwner(), target.getName(), src, dest));
         } else {
             model.moveChessPiece(src, dest);
             view.setChessComponentAtGrid(dest, chess);
-            savesFileWriter.teWrite(String.format("%s%s move from %s to %s\n", chess.getOwner(), chess.getName(), src, dest));
+            stringWriter.append(String.format("%s%s move from %s to %s\n", chess.getOwner(), chess.getName(), src, dest));
         }
     }
 
@@ -125,10 +126,10 @@ public class GameController implements GameListener {
                 }
             }
             view.repaint();
-            if (!win(point)) {
-                swapColor();
-            } else {
+            if (win(point)) {
                 afterWin();
+            } else {
+                swapColor();
             }
             // TODO: if the chess enter Dens or Traps and so on
         }
@@ -177,10 +178,10 @@ public class GameController implements GameListener {
                 }
 
                 view.repaint();
-                if (!win(point)) {
-                    swapColor();
-                } else {
+                if (win(point)) {
                     afterWin();
+                } else {
+                    swapColor();
                 }
             }
         }
