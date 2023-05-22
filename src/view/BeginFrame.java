@@ -63,9 +63,7 @@ public class BeginFrame extends JFrame {
         //add a button to exit the game:
         JButton exitButton = new JButton("退出游戏");
 
-        exitButton.addActionListener(e -> {
-            this.dispose();
-        });
+        exitButton.addActionListener(e -> this.dispose());
 
         exitButton.setFont(new Font("Rockwell", Font.BOLD, 30));
         GridBagConstraints constraints = new GridBagConstraints();
