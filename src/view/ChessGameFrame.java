@@ -20,10 +20,6 @@ public class ChessGameFrame extends JFrame {
     private final JButton ruleButton;
     private final int WIDTH;
     private final int HEIGTH;
-
-    private JPanel chessboardPanel;
-    private JPanel backgroundPanel;
-    private JPanel buttonPanel;
     public ChessGameFrame(int width, int height) {
         setTitle("2023 CS109 Project Demo"); //设置标题
         this.WIDTH = width;
