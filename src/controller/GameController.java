@@ -10,7 +10,7 @@ import view.CellComponent;
 import view.ChessComponent;
 import view.ChessboardComponent;
 import view.MessageText;
-
+import java.io.*;
 import java.awt.*;
 
 
@@ -30,18 +30,34 @@ public class GameController implements GameListener {
 
     // Record whether there is a selected piece before
     private ChessboardPoint selectedPoint;
-    private double count = 1;
+    private double round;
+    private static int count;
+    public static SavesFileWriter savesFileWriter;
 
-    public GameController(ChessboardComponent view, Chessboard model, MessageText roundText) {
+
+    public GameController(ChessboardComponent view, Chessboard model, MessageText roundText) throws IOException {
         this.view = view;
         this.model = model;
         this.roundText = roundText;
         this.currentPlayer = PlayerColor.BLUE;
 
         view.registerController(this);
+        savesFileWriter = new SavesFileWriter(new File("src/saves/0.txt"));
         //initialize();
         view.initiateChessComponent(model);
         view.repaint();
+        round = 1;
+    }
+
+    public static void save() throws IOException {
+        File[] list = new File("src/saves").listFiles();
+        if (list != null) {
+            count = list.length;
+        }
+        File newGameFile = new File(String.format("src/saves/save%d.txt", count + 1));
+        savesFileWriter = new SavesFileWriter(newGameFile);
+        savesFileWriter.write(savesFileWriter.getTemporaryArchive());
+        count ++;
     }
 
     private void initialize() {
@@ -55,8 +71,8 @@ public class GameController implements GameListener {
     // after a valid move swap the player
     private void swapColor() {
         currentPlayer = currentPlayer == PlayerColor.BLUE ? PlayerColor.RED : PlayerColor.BLUE;
-        count += 0.5;
-        roundText.setText((int) count + "");
+        round += 0.5;
+        roundText.setText(String.valueOf((int) round));
         roundText.setForeground(currentPlayer.getColor());
     }
 
@@ -66,24 +82,42 @@ public class GameController implements GameListener {
 
     private boolean win(ChessboardPoint point) {
         // TODO: Check the board if there is a winner--Done
-        boolean value = point.equals(ChessboardComponent.getDenRed()) || point.equals(ChessboardComponent.getDenBlue())
+        return point.equals(ChessboardComponent.getDenRed()) || point.equals(ChessboardComponent.getDenBlue())
                 || model.getBlue().isEmpty() || model.getRed().isEmpty();
-        if (value) {
-            System.out.println("游戏结束！");
-            //JOptionPane.showMessageDialog(null,"游戏结束！");
-            roundText.setFont(new Font("Black", Font.BOLD, 100));
-            roundText.setText("Win!");
-            view.disableEvents();
+    }
+
+    private void afterWin() {
+        System.out.println("游戏结束！");
+        //JOptionPane.showMessageDialog(null,"游戏结束！");
+        roundText.setFont(new Font("Black", Font.BOLD, 100));
+        roundText.setText("Win!");
+        view.disableEvents();
+    }
+
+    private void writeOperate(ChessboardPoint src, ChessboardPoint dest) throws IOException {
+        ChessComponent chess = view.removeChessComponentAtGrid(src);
+        if (model.hasChessPiece(dest)) {
+            ChessComponent target = view.removeChessComponentAtGrid(dest);
+            model.captureChessPiece(src, dest);
+            view.setChessComponentAtGrid(dest, chess);
+            savesFileWriter.teWrite(String.format("%s%s capture %s%s from %s to %s\n", chess.getOwner(), chess.getName(), target.getOwner(), target.getName(), src, dest));
+        } else {
+            model.moveChessPiece(src, dest);
+            view.setChessComponentAtGrid(dest, chess);
+            savesFileWriter.teWrite(String.format("%s%s move from %s to %s\n", chess.getOwner(), chess.getName(), src, dest));
         }
-        return value;
     }
 
     // click an empty cell
     @Override
     public void onPlayerClickCell(ChessboardPoint point, CellComponent component) {
         if (selectedPoint != null && model.isValidMove(selectedPoint, point)) {
-            model.moveChessPiece(selectedPoint, point);
-            view.setChessComponentAtGrid(point, view.removeChessComponentAtGrid(selectedPoint));
+            try {
+                writeOperate(selectedPoint, point);
+            } catch (IOException e) {
+                System.out.println("bugs");
+                throw new RuntimeException(e);
+            }
             selectedPoint = null;
             for (CellComponent[] cells : view.getGridComponents()) {
                 for (CellComponent cell : cells) {
@@ -94,9 +128,9 @@ public class GameController implements GameListener {
             if (!win(point)) {
                 swapColor();
             } else {
-                win(point);
+                afterWin();
             }
-            // TODO: if the chess enter Dens or Traps and so on--Done
+            // TODO: if the chess enter Dens or Traps and so on
         }
     }
 
@@ -129,20 +163,24 @@ public class GameController implements GameListener {
             view.repaint();
         } else if (!model.getChessPieceOwner(point).equals(currentPlayer)) {
             if (model.isValidCapture(selectedPoint, point)) {
-                model.captureChessPiece(selectedPoint, point);
-                view.removeChessComponentAtGrid(point);
-                view.setChessComponentAtGrid(point, view.removeChessComponentAtGrid(selectedPoint));
+
+                try {
+                    writeOperate(selectedPoint, point);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 selectedPoint = null;
                 for (CellComponent[] cells : view.getGridComponents()) {
                     for (CellComponent cell : cells) {
                         cell.setValidMove(false);
                     }
                 }
+
                 view.repaint();
                 if (!win(point)) {
                     swapColor();
                 } else {
-                    win(point);
+                    afterWin();
                 }
             }
         }
