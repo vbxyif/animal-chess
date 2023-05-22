@@ -16,25 +16,33 @@ import java.io.InputStreamReader;
  */
 public class ChessGameFrame extends JFrame {
     private static ChessboardComponent chessboardComponent;
-    //    public final Dimension FRAME_SIZE ;
+    private final JButton againButton;
+    private final JButton ruleButton;
     private final int WIDTH;
     private final int HEIGTH;
-    private final int ONE_CHESS_SIZE;
 
+    private JPanel chessboardPanel;
+    private JPanel backgroundPanel;
+    private JPanel buttonPanel;
     public ChessGameFrame(int width, int height) {
         setTitle("2023 CS109 Project Demo"); //设置标题
         this.WIDTH = width;
         this.HEIGTH = height;
-        this.ONE_CHESS_SIZE = (HEIGTH * 4 / 5) / 9;
+        int ONE_CHESS_SIZE = (HEIGTH * 4 / 5) / 9;
 
         setSize(WIDTH, HEIGTH);
         setLocationRelativeTo(null); // Center the window.
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); //设置程序关闭按键，如果点击右上方的叉就游戏全部关闭了
-        setLayout(null);
+        setChessboardComponent(new ChessboardComponent(ONE_CHESS_SIZE));
+        GridBagLayout gbl = new GridBagLayout();
+        setLayout(new FlowLayout());
 
         addChessboard();
         addBackground();
+        againButton = new JButton("重新开始");
+
         addAgainButton();
+        ruleButton = new JButton("规则");
         addRuleButton();
     }
 
@@ -47,7 +55,7 @@ public class ChessGameFrame extends JFrame {
     }
 
     private void addBackground() {
-        ImageIcon bgp = new ImageIcon("C:\\Users\\Admin\\Desktop\\笔记本\\Java作业\\CS109-2023-Sping-ChessDemo (1)\\resource\\background.jpg");
+        ImageIcon bgp = new ImageIcon("src/animals/background.jpg");
         JLabel bgl = new JLabel(bgp);
         bgl.setSize(WIDTH, HEIGTH);
         this.getLayeredPane().add(bgl, JLayeredPane.DEFAULT_LAYER);
@@ -57,7 +65,6 @@ public class ChessGameFrame extends JFrame {
      * 在游戏面板中添加棋盘
      */
     private void addChessboard() {
-        setChessboardComponent(new ChessboardComponent(ONE_CHESS_SIZE));
         chessboardComponent.setLocation(HEIGTH / 5, HEIGTH / 10);
         this.getLayeredPane().add(chessboardComponent, JLayeredPane.MODAL_LAYER);
     }
@@ -77,7 +84,6 @@ public class ChessGameFrame extends JFrame {
     }
 
     private void addRuleButton() {
-        JButton ruleButton = new JButton("规则");
         ruleButton.addActionListener(e -> {
             try {
                 StringBuilder messageText = new StringBuilder();
@@ -112,19 +118,22 @@ public class ChessGameFrame extends JFrame {
      */
 
     private void addAgainButton() {
-        JButton button = new JButton("重新开始");
-        button.addActionListener((e) -> {
+        againButton.addActionListener((e) -> {
             this.dispose();
             ChessGameFrame mainFrame = new ChessGameFrame(1100, 810);
-            GameController gameController = new GameController(getChessboardComponent(), new Chessboard(), new MessageText("1", Color.BLUE));
+            GameController gameController;
+            try {
+                gameController = new GameController(getChessboardComponent(), new Chessboard(), new MessageText("1", Color.BLUE));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
             mainFrame.addRoundText(gameController.getRoundText());
             mainFrame.setVisible(true);
         });
-        button.setLocation(HEIGTH, HEIGTH / 10 + 120);
-        button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        this.getLayeredPane().add(button, JLayeredPane.MODAL_LAYER);
+        againButton.setLocation(HEIGTH, HEIGTH / 10 + 120);
+        againButton.setSize(200, 60);
+        againButton.setFont(new Font("Rockwell", Font.BOLD, 20));
+        this.getLayeredPane().add(againButton, JLayeredPane.MODAL_LAYER);
     }
-
 
 }
