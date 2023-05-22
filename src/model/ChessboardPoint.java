@@ -18,6 +18,6 @@ public record ChessboardPoint(int row, int col) {
 
     @Override
     public String toString() {
-        return "(" + row + "," + col + ") " + "on the chessboard is clicked!";
+        return "(" + row + "," + col + ") ";
     }
 }
