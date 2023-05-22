@@ -87,19 +87,19 @@ public class Chessboard {
     private boolean isRiverNoRat(ChessboardPoint src, ChessboardPoint dest) {
         int x = dest.col() - src.col();
         int y = dest.row() - src.row();
-        if (!(x != 0 && y != 0) && !(x == 0 && y == 0)) {
+        if ((x == 0 || y == 0) && !(x == 0 && y == 0)) {
             int d = x != 0 ? x / Math.abs(x) : y / Math.abs(y);
-            for (int i = 0; i < Math.abs(x); i++) {
+            for (int i = 1; i < Math.abs(x); i++) {
                 ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
-                ChessPiece chess = getChessPieceAt(point);
-                if (chess.getName().equals(Name.鼠)) {
+                ChessPiece chess = isRiver(point) ? getChessPieceAt(point) : null;
+                if (chess != null && chess.getName().equals(Name.鼠) && isRiver(point)) {
                     return false;
                 }
             }
-            for (int i = 0; i < Math.abs(y); i++) {
+            for (int i = 1; i < Math.abs(y); i++) {
                 ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
-                ChessPiece chess = getChessPieceAt(point);
-                if (chess.getName().equals(Name.鼠)) {
+                ChessPiece chess = isRiver(point) ? getChessPieceAt(point) : null;
+                if (chess != null && chess.getName().equals(Name.鼠) && isRiver(point)) {
                     return false;
                 }
             }
@@ -111,6 +111,10 @@ public class Chessboard {
         return getChessboardComponent().getRiverCell().contains(dest);
     }
 
+    private boolean isRiverSide(ChessboardPoint dest) {
+        return getChessboardComponent().getRiversideCell().contains(dest);
+    }
+
     private boolean isNext(ChessboardPoint src, ChessboardPoint dest) {
         return calculateDistance(src, dest) == 1;
     }
@@ -120,20 +124,21 @@ public class Chessboard {
         int y = dest.row() - src.row();
         if (!(x != 0 && y != 0) && !(x == 0 && y == 0)) {
             int d = x != 0 ? x / Math.abs(x) : y / Math.abs(y);
-            for (int i = 0; i < Math.abs(x); i++) {
+            for (int i = 1; i < Math.abs(x); i++) {
                 ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
                 if (!isRiver(point)) {
                     return false;
                 }
             }
-            for (int i = 0; i < Math.abs(y); i++) {
+            for (int i = 1; i < Math.abs(y); i++) {
                 ChessboardPoint point = new ChessboardPoint(src.row() + d * i, src.col());
                 if (!isRiver(point)) {
                     return false;
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean canIn(ChessboardPoint src, ChessboardPoint dest) {
@@ -174,6 +179,12 @@ public class Chessboard {
 
     private void setChessPiece(ChessboardPoint point, ChessPiece chessPiece) {
         getGridAt(point).setPiece(chessPiece);
+        getChessPieceAt(point).fallInTrap(point);
+        getChessPieceAt(point).inWater(point);
+    }
+
+    public boolean hasChessPiece(ChessboardPoint point) {
+        return getChessPieceAt(point) != null;
     }
 
     public void moveChessPiece(ChessboardPoint src, ChessboardPoint dest) {
@@ -181,8 +192,6 @@ public class Chessboard {
             throw new IllegalArgumentException("Illegal chess move!");
         }
         setChessPiece(dest, removeChessPiece(src));
-        getChessPieceAt(dest).fallInTrap(dest);
-        getChessPieceAt(dest).inWater(dest);
     }
 
     public void captureChessPiece(ChessboardPoint src, ChessboardPoint dest) {
@@ -211,15 +220,20 @@ public class Chessboard {
         if (isRiver(dest)) {
             return canIn(src, dest);
         }
-        return canJump(src, dest) || isNext(src, dest);
+        if (isRiverSide(dest)) {
+            return canJump(src, dest) || isNext(src, dest);
+        }
+        return isNext(src, dest);
     }
 
     public boolean isValidCapture(ChessboardPoint src, ChessboardPoint dest) {
         // TODO:Fix this method--Done
         if (getChessPieceAt(dest) == null) {
-            return true;
+            return isValidMove(src, dest);
         } else {
-            return getChessPieceAt(src).canCapture(getChessPieceAt(dest));
+            getChessPieceAt(src).fallInTrap(src);
+            getChessPieceAt(src).inWater(src);
+            return isValidMove(src, dest) && getChessPieceAt(src).canCapture(getChessPieceAt(dest));
         }
     }
 }
