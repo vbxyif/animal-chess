@@ -32,6 +32,14 @@ public class ChessComponent extends JComponent {
         this.selected = selected;
     }
 
+    public PlayerColor getOwner() {
+        return owner;
+    }
+
+    public String getName() {
+        return name.toString();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
