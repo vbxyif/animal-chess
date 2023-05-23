@@ -219,4 +219,8 @@ public class ChessboardComponent extends JComponent {
             }
         }
     }
+
+    public GameController getGameController() {
+        return gameController;
+    }
 }

@@ -31,9 +31,7 @@ public class ChessPiece {
     }
 
     public void inWater(ChessboardPoint point) {
-        if (ChessGameFrame.getChessboardComponent().getRiverCell().contains(point)) {
-            this.inWater = true;
-        } else this.inWater = false;
+        this.inWater = ChessGameFrame.getChessboardComponent().getRiverCell().contains(point);
     }
 
     public boolean canCapture(ChessPiece target) {

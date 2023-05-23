@@ -6,10 +6,8 @@ import model.Chessboard;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.awt.event.MouseAdapter;
+import java.io.*;
 
 /**
  * 这个类表示游戏过程中的整个游戏界面，是一切的载体
@@ -20,17 +18,17 @@ public class ChessGameFrame extends JFrame {
     private final JButton ruleButton;
     private final int WIDTH;
     private final int HEIGTH;
+    private final int ONE_CHESS_SIZE;
     public ChessGameFrame(int width, int height) {
         setTitle("2023 CS109 Project Demo"); //设置标题
         this.WIDTH = width;
         this.HEIGTH = height;
-        int ONE_CHESS_SIZE = (HEIGTH * 4 / 5) / 9;
+        ONE_CHESS_SIZE = (HEIGTH * 4 / 5) / 9;
 
         setSize(WIDTH, HEIGTH);
         setLocationRelativeTo(null); // Center the window.
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); //设置程序关闭按键，如果点击右上方的叉就游戏全部关闭了
         setChessboardComponent(new ChessboardComponent(ONE_CHESS_SIZE));
-        GridBagLayout gbl = new GridBagLayout();
         setLayout(new FlowLayout());
 
         addChessboard();
@@ -40,6 +38,8 @@ public class ChessGameFrame extends JFrame {
         addAgainButton();
         ruleButton = new JButton("规则");
         addRuleButton();
+        addSaveButton();
+        addLoadButton();
     }
 
     public static ChessboardComponent getChessboardComponent() {
@@ -77,6 +77,85 @@ public class ChessGameFrame extends JFrame {
         roundText.setLocation(HEIGTH, HEIGTH / 10);
         roundText.setEditable(false);
         this.getLayeredPane().add(roundText, JLayeredPane.MODAL_LAYER);
+    }
+
+
+    //*Create a button named saveButton*//
+    private void addSaveButton() {
+        //*Create a button named saveButton*//
+        JButton saveButton = new JButton("保存");
+        saveButton.addActionListener(e -> {
+            try {
+                chessboardComponent.getGameController().save();
+                JOptionPane.showMessageDialog(null, "保存成功");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        saveButton.setLocation(HEIGTH, HEIGTH / 10 + 240);
+        saveButton.setSize(200, 60);
+        saveButton.setFont(new Font("Rockwell", Font.BOLD, 20));
+        this.getLayeredPane().add(saveButton, JLayeredPane.MODAL_LAYER);
+    }
+
+    private void addDialog() {
+        JDialog dialog = new JDialog();
+        dialog.setTitle("读取存档");
+        dialog.setSize(WIDTH / 3, HEIGTH / 2);
+        dialog.setLocationRelativeTo(null);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setLayout(new BorderLayout());
+        JList<String> list = new JList<String>();
+        DefaultListModel<String> model = new DefaultListModel<String>();
+        File[] files = new File("src/saves").listFiles();
+        String[] fileNames;
+        if (files != null) {
+            fileNames = new String[files.length];
+        } else {
+            fileNames = new String[0];
+        }
+        int i = 0;
+        if (files != null) {
+            for (File file : files) {
+                model.addElement(file.getName());
+                fileNames[i++] = file.getName();
+            }
+        }
+        list.setModel(model);
+        list.setBorder(BorderFactory.createTitledBorder("选择存档"));
+        final String[] str = {"src/"};
+        list.addListSelectionListener(e -> {
+            str[0] = fileNames[list.getSelectedIndex()];
+        });
+        JScrollPane scrollPane = new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setSize(WIDTH / 3, HEIGTH / 3);
+        scrollPane.setVisible(true);
+        dialog.add(scrollPane);
+        JButton okButton = new JButton("确定");
+        okButton.setSize(WIDTH / 5, HEIGTH / 6);
+        okButton.addActionListener(e -> {
+            try {
+                GameController gameController = chessboardComponent.getGameController();
+                gameController.load("src/saves/" + str[0]);
+                JOptionPane.showMessageDialog(null, "加载成功");
+                dialog.dispose();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        dialog.add(okButton, BorderLayout.SOUTH);
+        dialog.setVisible(true);
+    }
+
+    private void addLoadButton() {
+        JButton loadButton = new JButton("加载");
+        loadButton.addActionListener(e -> {
+            addDialog();
+        });
+        loadButton.setLocation(HEIGTH, HEIGTH / 10 + 300);
+        loadButton.setSize(200, 60);
+        loadButton.setFont(new Font("Rockwell", Font.BOLD, 20));
+        this.getLayeredPane().add(loadButton, JLayeredPane.MODAL_LAYER);
     }
 
     private void addRuleButton() {

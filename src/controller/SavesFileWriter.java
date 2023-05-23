@@ -6,13 +6,7 @@ import java.io.IOException;
 
 public class SavesFileWriter extends FileWriter {
 
-    private static String temporaryArchive;
-
-    public SavesFileWriter(String fileName) throws IOException {
-        super(fileName);
-    }
-
-    public SavesFileWriter(String fileName, boolean append) throws IOException {
+    private SavesFileWriter(String fileName, boolean append) throws IOException {
         super(fileName, append);
     }
 
@@ -24,4 +18,7 @@ public class SavesFileWriter extends FileWriter {
         super(file, append);
     }
 
+    public static SavesFileWriter createSavesFileWriter(String fileName, boolean append) throws IOException {
+        return new SavesFileWriter(fileName, append);
+    }
 }
