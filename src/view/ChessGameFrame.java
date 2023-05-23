@@ -231,9 +231,7 @@ public class ChessGameFrame extends JFrame {
      */
 
     private void addAgainButton() {
-        againButton.addActionListener((e) -> {
-            againController();
-        });
+        againButton.addActionListener((e) -> againController());
         againButton.setLocation(HEIGTH, HEIGTH / 10 + 120);
         againButton.setSize(200, 60);
         againButton.setFont(new Font("Rockwell", Font.BOLD, 20));
@@ -242,9 +240,7 @@ public class ChessGameFrame extends JFrame {
 
     private void addExitButton() {
         JButton exitButton = new JButton("退出");
-        exitButton.addActionListener((e) -> {
-            System.exit(0);
-        });
+        exitButton.addActionListener((e) -> System.exit(0));
         exitButton.setLocation(HEIGTH, HEIGTH / 10 + 550);
         exitButton.setSize(200, 60);
         exitButton.setFont(new Font("Rockwell", Font.BOLD, 20));
