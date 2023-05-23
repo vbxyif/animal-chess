@@ -14,11 +14,4 @@ public class SavesFileWriter extends FileWriter {
         super(file);
     }
 
-    public SavesFileWriter(File file, boolean append) throws IOException {
-        super(file, append);
-    }
-
-    public static SavesFileWriter createSavesFileWriter(String fileName, boolean append) throws IOException {
-        return new SavesFileWriter(fileName, append);
-    }
 }

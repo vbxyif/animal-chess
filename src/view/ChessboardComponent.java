@@ -144,7 +144,7 @@ public class ChessboardComponent extends JComponent {
                 if (riverCell.contains(temp)) {
                     cell = new CellComponent(Color.CYAN, calculatePoint(i, j), CHESS_SIZE, "river");
                     this.add(cell);
-                } else if (riversideCell.contains(temp) || riversideCell.contains(temp)) {
+                } else if (riversideCell.contains(temp)) {
                     cell = new CellComponent(new Color(46, 80, 44), calculatePoint(i, j), CHESS_SIZE, "riverside");
                     this.add(cell);
                 } else if (trapRed.contains(temp) || trapBlue.contains(temp)) {

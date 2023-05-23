@@ -4,14 +4,17 @@ package controller;
 import listener.GameListener;
 import model.Chessboard;
 import model.ChessboardPoint;
-import model.Constant;
 import model.PlayerColor;
 import view.CellComponent;
 import view.ChessComponent;
 import view.ChessboardComponent;
 import view.MessageText;
-import java.io.*;
+
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -148,13 +151,6 @@ public class GameController implements GameListener {
         model.captureChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
 
-    }
-
-    private void initialize() {
-        for (int i = 0; i < Constant.CHESSBOARD_ROW_SIZE.getNum(); i++) {
-            for (int j = 0; j < Constant.CHESSBOARD_COL_SIZE.getNum(); j++) {
-            }
-        }
     }
 
     // after a valid move swap the player

@@ -6,7 +6,6 @@ import model.Chessboard;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
 import java.io.*;
 
 /**
@@ -18,12 +17,12 @@ public class ChessGameFrame extends JFrame {
     private final JButton ruleButton;
     private final int WIDTH;
     private final int HEIGTH;
-    private final int ONE_CHESS_SIZE;
+
     public ChessGameFrame(int width, int height) {
         setTitle("2023 CS109 Project Demo"); //设置标题
         this.WIDTH = width;
         this.HEIGTH = height;
-        ONE_CHESS_SIZE = (HEIGTH * 4 / 5) / 9;
+        int ONE_CHESS_SIZE = (HEIGTH * 4 / 5) / 9;
 
         setSize(WIDTH, HEIGTH);
         setLocationRelativeTo(null); // Center the window.
@@ -105,8 +104,8 @@ public class ChessGameFrame extends JFrame {
         dialog.setLocationRelativeTo(null);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.setLayout(new BorderLayout());
-        JList<String> list = new JList<String>();
-        DefaultListModel<String> model = new DefaultListModel<String>();
+        JList<String> list = new JList<>();
+        DefaultListModel<String> model = new DefaultListModel<>();
         File[] files = new File("src/saves").listFiles();
         String[] fileNames;
         if (files != null) {
@@ -124,9 +123,7 @@ public class ChessGameFrame extends JFrame {
         list.setModel(model);
         list.setBorder(BorderFactory.createTitledBorder("选择存档"));
         final String[] str = {"src/"};
-        list.addListSelectionListener(e -> {
-            str[0] = fileNames[list.getSelectedIndex()];
-        });
+        list.addListSelectionListener(e -> str[0] = fileNames[list.getSelectedIndex()]);
         JScrollPane scrollPane = new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setSize(WIDTH / 3, HEIGTH / 3);
         scrollPane.setVisible(true);
@@ -149,9 +146,7 @@ public class ChessGameFrame extends JFrame {
 
     private void addLoadButton() {
         JButton loadButton = new JButton("加载");
-        loadButton.addActionListener(e -> {
-            addDialog();
-        });
+        loadButton.addActionListener(e -> addDialog());
         loadButton.setLocation(HEIGTH, HEIGTH / 10 + 300);
         loadButton.setSize(200, 60);
         loadButton.setFont(new Font("Rockwell", Font.BOLD, 20));
