@@ -55,6 +55,7 @@ public class BeginFrame extends JFrame {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
+        constraints.insets = new Insets(10, 10, 10, 10);
         layeredPane.setLayer(beginButton, 0);
         layeredPane.add(beginButton, constraints);
     }
@@ -69,6 +70,7 @@ public class BeginFrame extends JFrame {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 1;
+        constraints.insets = new Insets(10, 10, 10, 10);
         layeredPane.setLayer(exitButton, 0);
         layeredPane.add(exitButton, constraints);
     }

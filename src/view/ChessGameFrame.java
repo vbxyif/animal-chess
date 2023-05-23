@@ -17,6 +17,7 @@ public class ChessGameFrame extends JFrame {
     private final JButton ruleButton;
     private final int WIDTH;
     private final int HEIGTH;
+    private JDialog dialog;
 
     public ChessGameFrame(int width, int height) {
         setTitle("2023 CS109 Project Demo"); //设置标题
@@ -39,6 +40,8 @@ public class ChessGameFrame extends JFrame {
         addRuleButton();
         addSaveButton();
         addLoadButton();
+        addExitButton();
+        addUndoButton();
     }
 
     public static ChessboardComponent getChessboardComponent() {
@@ -78,27 +81,49 @@ public class ChessGameFrame extends JFrame {
         this.getLayeredPane().add(roundText, JLayeredPane.MODAL_LAYER);
     }
 
+    private void addSaveText() {
+        dialog = new JDialog();
+        dialog.setTitle("命名存档");
+        dialog.setSize(WIDTH / 3, HEIGTH / 10);
+        dialog.setLocationRelativeTo(null);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setLayout(new BorderLayout());
+        JTextField textField = new JTextField();
+        textField.setFont(new Font("Black", Font.BOLD, 15));
+        textField.setSize(WIDTH / 4, HEIGTH / 14);
+        dialog.add(textField, BorderLayout.CENTER);
+        JButton saveButton = new JButton("保存");
+        saveButton.setFont(new Font("Black", Font.BOLD, 15));
+        saveButton.setSize(WIDTH / 10, HEIGTH / 14);
+        saveButton.addActionListener(e -> {
+            try {
+                chessboardComponent.getGameController().save(textField.getText());
+                dialog.dispose();
+                JOptionPane.showMessageDialog(null, "保存成功");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "保存失败");
+                throw new RuntimeException(ex);
+            }
+        });
+        dialog.add(saveButton, BorderLayout.EAST);
+    }
 
     //*Create a button named saveButton*//
     private void addSaveButton() {
         //*Create a button named saveButton*//
         JButton saveButton = new JButton("保存");
         saveButton.addActionListener(e -> {
-            try {
-                chessboardComponent.getGameController().save();
-                JOptionPane.showMessageDialog(null, "保存成功");
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            addSaveText();
+            dialog.setVisible(true);
         });
-        saveButton.setLocation(HEIGTH, HEIGTH / 10 + 240);
+        saveButton.setLocation(HEIGTH, HEIGTH / 10 + 260);
         saveButton.setSize(200, 60);
         saveButton.setFont(new Font("Rockwell", Font.BOLD, 20));
         this.getLayeredPane().add(saveButton, JLayeredPane.MODAL_LAYER);
     }
 
-    private void addDialog() {
-        JDialog dialog = new JDialog();
+    private void addLoadDialog() {
+        dialog = new JDialog();
         dialog.setTitle("读取存档");
         dialog.setSize(WIDTH / 3, HEIGTH / 2);
         dialog.setLocationRelativeTo(null);
@@ -116,27 +141,31 @@ public class ChessGameFrame extends JFrame {
         int i = 0;
         if (files != null) {
             for (File file : files) {
+                if (!file.getName().endsWith(".txt")) {
+                    continue;
+                }
                 model.addElement(file.getName());
                 fileNames[i++] = file.getName();
             }
         }
         list.setModel(model);
         list.setBorder(BorderFactory.createTitledBorder("选择存档"));
-        final String[] str = {"src/"};
+        list.setFont(new Font("Black", Font.BOLD, 18));
+        final String[] str = {""};
         list.addListSelectionListener(e -> str[0] = fileNames[list.getSelectedIndex()]);
         JScrollPane scrollPane = new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setSize(WIDTH / 3, HEIGTH / 3);
-        scrollPane.setVisible(true);
-        dialog.add(scrollPane);
+        dialog.add(scrollPane, BorderLayout.CENTER);
         JButton okButton = new JButton("确定");
         okButton.setSize(WIDTH / 5, HEIGTH / 6);
         okButton.addActionListener(e -> {
             try {
-                GameController gameController = chessboardComponent.getGameController();
+                GameController gameController = againController();
                 gameController.load("src/saves/" + str[0]);
-                JOptionPane.showMessageDialog(null, "加载成功");
                 dialog.dispose();
+                JOptionPane.showMessageDialog(null, "加载成功");
             } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "加载失败");
                 throw new RuntimeException(ex);
             }
         });
@@ -146,11 +175,27 @@ public class ChessGameFrame extends JFrame {
 
     private void addLoadButton() {
         JButton loadButton = new JButton("加载");
-        loadButton.addActionListener(e -> addDialog());
-        loadButton.setLocation(HEIGTH, HEIGTH / 10 + 300);
+        loadButton.addActionListener(e -> addLoadDialog());
+        loadButton.setLocation(HEIGTH, HEIGTH / 10 + 330);
         loadButton.setSize(200, 60);
         loadButton.setFont(new Font("Rockwell", Font.BOLD, 20));
         this.getLayeredPane().add(loadButton, JLayeredPane.MODAL_LAYER);
+    }
+
+    private void addUndoButton() {
+        JButton undoButton = new JButton("悔棋");
+        undoButton.addActionListener(e -> {
+            if (chessboardComponent.getGameController().canUndo()) {
+                GameController gameController = againController();
+                gameController.undo();
+            } else {
+                JOptionPane.showMessageDialog(null, "悔棋失败");
+            }
+        });
+        undoButton.setLocation(HEIGTH, HEIGTH / 10 + 480);
+        undoButton.setSize(200, 60);
+        undoButton.setFont(new Font("Rockwell", Font.BOLD, 20));
+        this.getLayeredPane().add(undoButton, JLayeredPane.MODAL_LAYER);
     }
 
     private void addRuleButton() {
@@ -164,9 +209,7 @@ public class ChessGameFrame extends JFrame {
                 String strTmp;
                 while ((strTmp = bufferedReader.readLine()) != null) {
                     messageText.append("\n").append(strTmp);
-                    //System.out.println(strTmp);
                 }
-                //JOptionPane.showMessageDialog(null, messageText,"规则",JOptionPane.INFORMATION_MESSAGE);
                 {
                     TextFrame ruleFrame = new TextFrame(600, 800);
                     ruleFrame.setTitle("规则");
@@ -177,7 +220,7 @@ public class ChessGameFrame extends JFrame {
                 throw new RuntimeException(ex);
             }
         });
-        ruleButton.setLocation(HEIGTH, HEIGTH / 10 + 180);
+        ruleButton.setLocation(HEIGTH, HEIGTH / 10 + 190);
         ruleButton.setSize(200, 60);
         ruleButton.setFont(new Font("Rockwell", Font.BOLD, 20));
         this.getLayeredPane().add(ruleButton, JLayeredPane.MODAL_LAYER);
@@ -189,21 +232,37 @@ public class ChessGameFrame extends JFrame {
 
     private void addAgainButton() {
         againButton.addActionListener((e) -> {
-            this.dispose();
-            ChessGameFrame mainFrame = new ChessGameFrame(1100, 810);
-            GameController gameController;
-            try {
-                gameController = new GameController(getChessboardComponent(), new Chessboard(), new MessageText("1", Color.BLUE));
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            mainFrame.addRoundText(gameController.getRoundText());
-            mainFrame.setVisible(true);
+            againController();
         });
         againButton.setLocation(HEIGTH, HEIGTH / 10 + 120);
         againButton.setSize(200, 60);
         againButton.setFont(new Font("Rockwell", Font.BOLD, 20));
         this.getLayeredPane().add(againButton, JLayeredPane.MODAL_LAYER);
+    }
+
+    private void addExitButton() {
+        JButton exitButton = new JButton("退出");
+        exitButton.addActionListener((e) -> {
+            System.exit(0);
+        });
+        exitButton.setLocation(HEIGTH, HEIGTH / 10 + 550);
+        exitButton.setSize(200, 60);
+        exitButton.setFont(new Font("Rockwell", Font.BOLD, 20));
+        this.getLayeredPane().add(exitButton, JLayeredPane.MODAL_LAYER);
+    }
+
+    public GameController againController() {
+        this.dispose();
+        ChessGameFrame mainFrame = new ChessGameFrame(1100, 810);
+        GameController gameController;
+        try {
+            gameController = new GameController(getChessboardComponent(), new Chessboard(), new MessageText("1", Color.BLUE));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        mainFrame.addRoundText(gameController.getRoundText());
+        mainFrame.setVisible(true);
+        return gameController;
     }
 
 }

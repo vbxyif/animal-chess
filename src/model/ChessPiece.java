@@ -47,7 +47,7 @@ public class ChessPiece {
         if (this.inWater) {
             thisRank = 0;
         }
-        if (targetRank == 0 || thisRank >= targetRank || (thisRank == 1 && targetRank == 8)) {
+        if (targetRank == 0 || (thisRank >= targetRank && !(thisRank == 8 && targetRank == 1)) || thisRank == 1 && targetRank == 8) {
             return !this.getOwner().equals(target.getOwner());
         }
         return false;

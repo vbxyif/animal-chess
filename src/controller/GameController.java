@@ -28,18 +28,18 @@ import java.util.regex.Pattern;
 public class GameController implements GameListener {
 
 
-    private final Chessboard model;
-    private final ChessboardComponent view;
+    private Chessboard model;
+    private ChessboardComponent view;
     private final MessageText roundText;
     private PlayerColor currentPlayer;
 
     // Record whether there is a selected piece before
     private ChessboardPoint selectedPoint;
     private double round;
-    private static int count;
     public static SavesFileWriter savesFileWriter;
     public static FileReader savesFileReader;
-    private static final StringBuilder stringWriter = new StringBuilder();
+    private static StringBuilder stringWriter = new StringBuilder();
+    public int loading = 0;
 
 
     public GameController(ChessboardComponent view, Chessboard model, MessageText roundText) throws IOException {
@@ -53,35 +53,74 @@ public class GameController implements GameListener {
         view.initiateChessComponent(model);
         view.repaint();
         round = 1;
-        File[] list = new File("src/saves").listFiles();
-        if (list != null) {
-            count = list.length;
-        }
     }
 
-    public void save() throws IOException {
-        File newGameFile = new File(String.format("src/saves/save%d.txt", count + 1));
+    public boolean canUndo() {
+        return stringWriter.length() > 0;
+    }
+
+    public void undo() {
+        String[] lines = stringWriter.toString().split("\n");
+        for (String line : lines) {
+            if (line.equals(lines[lines.length - 1])) {
+                break;
+            }
+            if (line.matches("\\d+.\\d")) {
+                round = Double.parseDouble(line);
+                line = " ";
+            } else if(line.matches("\\D")){
+                currentPlayer = line.equals("BLUE") ? PlayerColor.BLUE : PlayerColor.RED;
+                line = " ";
+            }else if (match(line)) {
+                matchCapture(line);
+            } else {
+                matchMove(line);
+            }
+            if (!line.equals(" ")) {
+                stringWriter.append(line).append("\n");
+            }
+        }
+        view.repaint();
+        stringWriter = new StringBuilder();
+        for (String line : lines) {
+            if (line.equals(lines[lines.length - 1])) {
+                break;
+            }
+            stringWriter.append(line).append("\n");
+        }
+        roundText.setText(String.valueOf((int) round));
+        roundText.setForeground(currentPlayer.getColor());
+        view.repaint();
+    }
+
+    public void save(String str) throws IOException {
+        File newGameFile = new File(String.format("src/saves/%s.txt", str));
         savesFileWriter = new SavesFileWriter(newGameFile);
         savesFileWriter.write(stringWriter.toString());
         savesFileWriter.write(round + "\n");
         savesFileWriter.write(currentPlayer.toString());
         savesFileWriter.close();
-        count ++;
     }
 
     public void load(String str) throws IOException {
-        File newGameFile = new File(String.format(str, count));
+        stringWriter = new StringBuilder();
+        File newGameFile = new File(str);
         savesFileReader = new FileReader(newGameFile);
         BufferedReader bufferedReader = new BufferedReader(savesFileReader);
         for (String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine()) {
             if (line.matches("\\d+.\\d")) {
                 round = Double.parseDouble(line);
+                line = " ";
             } else if(line.matches("\\D")){
                 currentPlayer = line.equals("BLUE") ? PlayerColor.BLUE : PlayerColor.RED;
-            }else if (!match(line)) {
+                break;
+            }else if (match(line)) {
                 matchCapture(line);
             } else {
                 matchMove(line);
+            }
+            if (!line.equals(" ")) {
+                stringWriter.append(line).append("\n");
             }
         }
         bufferedReader.close();
@@ -89,6 +128,7 @@ public class GameController implements GameListener {
         roundText.setText(String.valueOf((int) round));
         roundText.setForeground(currentPlayer.getColor());
         view.repaint();
+        loading++;
     }
 
     private ChessboardPoint text2point(String text) {
@@ -108,7 +148,7 @@ public class GameController implements GameListener {
         String pattern = "(\\(\\D,\\D\\)) move from (\\(\\d,\\d\\)) to (\\(\\d,\\d\\))";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(str);
-        return m.find();
+        return !m.find();
     }
     private void matchMove(String str) {
 
@@ -128,7 +168,7 @@ public class GameController implements GameListener {
         ChessComponent chess = view.removeChessComponentAtGrid(srcPoint);
         model.moveChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
-
+        swapColor();
     }
 
     private void matchCapture(String str) {
@@ -150,7 +190,7 @@ public class GameController implements GameListener {
         view.removeChessComponentAtGrid(destPoint);
         model.captureChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
-
+        swapColor();
     }
 
     // after a valid move swap the player

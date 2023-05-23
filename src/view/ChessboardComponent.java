@@ -42,6 +42,9 @@ public class ChessboardComponent extends JComponent {
         initiateGridComponents();
     }
 
+    public int getChessSize() {
+        return CHESS_SIZE;
+    }
     public static ChessboardPoint getDenRed() {
         return denRed;
     }
