@@ -23,7 +23,7 @@ import static model.Constant.CHESSBOARD_ROW_SIZE;
 public class ChessboardComponent extends JComponent {
     private static final ChessboardPoint denRed = new ChessboardPoint(0, 3);
     private static final ChessboardPoint denBlue = new ChessboardPoint(8, 3);
-    private CellComponent[][] gridComponents = new CellComponent[CHESSBOARD_ROW_SIZE.getNum()][CHESSBOARD_COL_SIZE.getNum()];
+    private final CellComponent[][] gridComponents = new CellComponent[CHESSBOARD_ROW_SIZE.getNum()][CHESSBOARD_COL_SIZE.getNum()];
     private final int CHESS_SIZE;
     private final Set<ChessboardPoint> riverCell = new HashSet<>();
     private final Set<ChessboardPoint> riversideCell = new HashSet<>();

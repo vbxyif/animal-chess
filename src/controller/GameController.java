@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 public class GameController implements GameListener {
 
 
-    private Chessboard model;
+    private final Chessboard model;
     private final ChessboardComponent view;
     private final MessageText roundText;
     private PlayerColor currentPlayer;
