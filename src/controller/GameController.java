@@ -128,6 +128,15 @@ public class GameController implements GameListener {
         view.repaint();
     }
 
+    public void delete(String str) throws IOException {
+        File newGameFile = new File(str);
+        if (newGameFile.delete()) {
+            System.out.println("删除成功");
+        } else {
+            System.out.println("删除失败");
+        }
+    }
+
     private ChessboardPoint text2point(String text) {
         Pattern r = Pattern.compile("\\d");
         Matcher matcher = r.matcher(text);

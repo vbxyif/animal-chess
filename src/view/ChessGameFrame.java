@@ -96,8 +96,8 @@ public class ChessGameFrame extends JFrame {
         saveButton.setSize(WIDTH / 10, HEIGTH / 14);
         saveButton.addActionListener(e -> {
             try {
-                chessboardComponent.getGameController().save(textField.getText());
                 dialog.dispose();
+                chessboardComponent.getGameController().save(textField.getText());
                 JOptionPane.showMessageDialog(null, "保存成功");
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "保存失败");
@@ -155,8 +155,10 @@ public class ChessGameFrame extends JFrame {
         JScrollPane scrollPane = new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setSize(WIDTH / 3, HEIGTH / 3);
         dialog.add(scrollPane, BorderLayout.CENTER);
+        JPanel buttonPane = new JPanel();
+        buttonPane.setLayout(new FlowLayout());
         JButton okButton = new JButton("确定");
-        okButton.setSize(WIDTH / 5, HEIGTH / 6);
+        okButton.setSize(WIDTH / 10, HEIGTH / 6);
         okButton.addActionListener(e -> {
             try {
                 GameController gameController = againController();
@@ -168,7 +170,22 @@ public class ChessGameFrame extends JFrame {
                 throw new RuntimeException(ex);
             }
         });
-        dialog.add(okButton, BorderLayout.SOUTH);
+        buttonPane.add(okButton);
+        JButton deleteButton = new JButton("删除");
+        deleteButton.setSize(WIDTH / 10, HEIGTH / 6);
+        deleteButton.addActionListener(e -> {
+            try {
+                GameController gameController = againController();
+                gameController.delete("src/saves/" + str[0]);
+                dialog.dispose();
+                JOptionPane.showMessageDialog(null, "删除成功");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "删除失败");
+                throw new RuntimeException(ex);
+            }
+        });
+        buttonPane.add(deleteButton);
+        dialog.add(buttonPane, BorderLayout.SOUTH);
         dialog.setVisible(true);
     }
 
