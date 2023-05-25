@@ -39,7 +39,6 @@ public class GameController implements GameListener {
     public static SavesFileWriter savesFileWriter;
     public static FileReader savesFileReader;
     private static StringBuilder stringWriter = new StringBuilder();
-    public int loading = 0;
 
 
     public GameController(ChessboardComponent view, Chessboard model, MessageText roundText) throws IOException {
@@ -127,7 +126,6 @@ public class GameController implements GameListener {
         roundText.setText(String.valueOf((int) round));
         roundText.setForeground(currentPlayer.getColor());
         view.repaint();
-        loading++;
     }
 
     private ChessboardPoint text2point(String text) {
