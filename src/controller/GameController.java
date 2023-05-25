@@ -90,13 +90,22 @@ public class GameController implements GameListener {
         view.repaint();
     }
 
-    public void save(String str) throws IOException {
+    public boolean save(String str) throws IOException {
+        boolean result;
         File newGameFile = new File(String.format("src/saves/%s.txt", str));
+        if (newGameFile.createNewFile()) {
+            System.out.println("文件创建成功");
+            result = true;
+        } else {
+            System.out.println("文件创建失败");
+            result = false;
+        }
         savesFileWriter = new SavesFileWriter(newGameFile);
         savesFileWriter.write(stringWriter.toString());
         savesFileWriter.write(round + "\n");
         savesFileWriter.write(currentPlayer.toString());
         savesFileWriter.close();
+        return result;
     }
 
     public void load(String str) throws IOException {
@@ -128,12 +137,14 @@ public class GameController implements GameListener {
         view.repaint();
     }
 
-    public void delete(String str) throws IOException {
+    public boolean delete(String str) throws IOException {
         File newGameFile = new File(str);
         if (newGameFile.delete()) {
             System.out.println("删除成功");
+            return true;
         } else {
             System.out.println("删除失败");
+            return false;
         }
     }
 
