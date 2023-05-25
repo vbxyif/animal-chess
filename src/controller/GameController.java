@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 public class GameController implements GameListener {
 
 
-    private final Chessboard model;
+    private Chessboard model;
     private final ChessboardComponent view;
     private final MessageText roundText;
     private PlayerColor currentPlayer;
@@ -49,7 +49,6 @@ public class GameController implements GameListener {
         this.currentPlayer = PlayerColor.BLUE;
 
         view.registerController(this);
-        //initialize();
         view.initiateChessComponent(model);
         view.repaint();
         round = 1;
@@ -80,7 +79,6 @@ public class GameController implements GameListener {
                 stringWriter.append(line).append("\n");
             }
         }
-        view.repaint();
         stringWriter = new StringBuilder();
         for (String line : lines) {
             if (line.equals(lines[lines.length - 1])) {
@@ -112,7 +110,8 @@ public class GameController implements GameListener {
                 round = Double.parseDouble(line);
                 line = " ";
             } else if(line.matches("\\D")){
-                currentPlayer = line.equals("BLUE") ? PlayerColor.BLUE : PlayerColor.RED;
+                currentPlayer = line.equals("B") ? PlayerColor.BLUE : PlayerColor.RED;
+                System.out.println(currentPlayer);
                 break;
             }else if (match(line)) {
                 matchCapture(line);
@@ -168,7 +167,6 @@ public class GameController implements GameListener {
         ChessComponent chess = view.removeChessComponentAtGrid(srcPoint);
         model.moveChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
-        swapColor();
     }
 
     private void matchCapture(String str) {
@@ -190,7 +188,6 @@ public class GameController implements GameListener {
         view.removeChessComponentAtGrid(destPoint);
         model.captureChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
-        swapColor();
     }
 
     // after a valid move swap the player

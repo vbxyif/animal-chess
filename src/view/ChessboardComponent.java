@@ -10,6 +10,7 @@ import model.ChessboardPoint;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ import static model.Constant.CHESSBOARD_ROW_SIZE;
 public class ChessboardComponent extends JComponent {
     private static final ChessboardPoint denRed = new ChessboardPoint(0, 3);
     private static final ChessboardPoint denBlue = new ChessboardPoint(8, 3);
-    private final CellComponent[][] gridComponents = new CellComponent[CHESSBOARD_ROW_SIZE.getNum()][CHESSBOARD_COL_SIZE.getNum()];
+    private CellComponent[][] gridComponents = new CellComponent[CHESSBOARD_ROW_SIZE.getNum()][CHESSBOARD_COL_SIZE.getNum()];
     private final int CHESS_SIZE;
     private final Set<ChessboardPoint> riverCell = new HashSet<>();
     private final Set<ChessboardPoint> riversideCell = new HashSet<>();
@@ -71,6 +72,15 @@ public class ChessboardComponent extends JComponent {
             }
         }
 
+    }
+
+    public void reset(Chessboard chessboard) throws IOException {
+        for (int i = 0; i < CHESSBOARD_ROW_SIZE.getNum(); i++) {
+            for (int j = 0; j < CHESSBOARD_COL_SIZE.getNum(); j++) {
+                gridComponents[i][j].removeAll();
+            }
+        }
+        this.gameController = new GameController(this, chessboard,new MessageText("1", Color.BLUE));
     }
 
     public Set<ChessboardPoint> getRiversideCell() {

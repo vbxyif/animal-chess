@@ -13,16 +13,16 @@ import java.io.*;
  */
 public class ChessGameFrame extends JFrame {
     private static ChessboardComponent chessboardComponent;
-    private final JButton againButton;
-    private final JButton ruleButton;
     private final int WIDTH;
     private final int HEIGTH;
     private JDialog dialog;
+    private MessageText roundText;
 
     public ChessGameFrame(int width, int height) {
-        setTitle("2023 CS109 Project Demo"); //设置标题
+        setTitle("2023 CS109 Project Animal Chess"); //设置标题
         this.WIDTH = width;
         this.HEIGTH = height;
+
         int ONE_CHESS_SIZE = (HEIGTH * 4 / 5) / 9;
 
         setSize(WIDTH, HEIGTH);
@@ -33,10 +33,8 @@ public class ChessGameFrame extends JFrame {
 
         addChessboard();
         addBackground();
-        againButton = new JButton("重新开始");
 
         addAgainButton();
-        ruleButton = new JButton("规则");
         addRuleButton();
         addSaveButton();
         addLoadButton();
@@ -78,7 +76,8 @@ public class ChessGameFrame extends JFrame {
         roundText.setFont(new Font("Black", Font.BOLD, 100));
         roundText.setLocation(HEIGTH, HEIGTH / 10);
         roundText.setEditable(false);
-        this.getLayeredPane().add(roundText, JLayeredPane.MODAL_LAYER);
+        this.roundText = roundText;
+        this.getLayeredPane().add(this.roundText, JLayeredPane.MODAL_LAYER);
     }
 
     private void addSaveText() {
@@ -186,7 +185,12 @@ public class ChessGameFrame extends JFrame {
         JButton undoButton = new JButton("悔棋");
         undoButton.addActionListener(e -> {
             if (chessboardComponent.getGameController().canUndo()) {
-                GameController gameController = againController();
+                GameController gameController;
+                try {
+                    gameController = againController();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
                 gameController.undo();
             } else {
                 JOptionPane.showMessageDialog(null, "悔棋失败");
@@ -199,6 +203,7 @@ public class ChessGameFrame extends JFrame {
     }
 
     private void addRuleButton() {
+        JButton ruleButton = new JButton("规则");
         ruleButton.addActionListener(e -> {
             try {
                 StringBuilder messageText = new StringBuilder();
@@ -231,7 +236,14 @@ public class ChessGameFrame extends JFrame {
      */
 
     private void addAgainButton() {
-        againButton.addActionListener((e) -> againController());
+        JButton againButton = new JButton("重新开始");
+        againButton.addActionListener((e) -> {
+            try {
+                againController();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         againButton.setLocation(HEIGTH, HEIGTH / 10 + 120);
         againButton.setSize(200, 60);
         againButton.setFont(new Font("Rockwell", Font.BOLD, 20));
@@ -247,18 +259,14 @@ public class ChessGameFrame extends JFrame {
         this.getLayeredPane().add(exitButton, JLayeredPane.MODAL_LAYER);
     }
 
-    public GameController againController() {
-        this.dispose();
-        ChessGameFrame mainFrame = new ChessGameFrame(1100, 810);
-        GameController gameController;
-        try {
-            gameController = new GameController(getChessboardComponent(), new Chessboard(), new MessageText("1", Color.BLUE));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        mainFrame.addRoundText(gameController.getRoundText());
-        mainFrame.setVisible(true);
-        return gameController;
+    public GameController againController() throws IOException {
+        getLayeredPane().remove(chessboardComponent);
+        chessboardComponent.reset(new Chessboard());
+        getLayeredPane().add(chessboardComponent, JLayeredPane.MODAL_LAYER);
+        GameController gameController = chessboardComponent.getGameController();
+        getLayeredPane().remove(roundText);
+        addRoundText(gameController.getRoundText());
+        return chessboardComponent.getGameController();
     }
 
 }
