@@ -10,6 +10,10 @@ import view.ChessComponent;
 import view.ChessboardComponent;
 import view.MessageText;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
@@ -50,7 +54,11 @@ public class GameController implements GameListener {
         this.roundText = new MessageText(String.valueOf((int) round), currentPlayer.getColor());
 
         view.registerController(this);
-        view.initiateChessComponent(model);
+        try {
+            view.initiateChessComponent(model);
+        } catch (UnsupportedAudioFileException | LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
         view.repaint();
     }
 
@@ -270,16 +278,41 @@ public class GameController implements GameListener {
         view.disableEvents();
     }
 
+    private void startClip(String str) throws LineUnavailableException {
+        Clip clip = AudioSystem.getClip();
+        try {
+            clip.open(AudioSystem.getAudioInputStream(new File("src/wav/" + str +".wav")));
+        } catch (IOException | UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                clip.start();
+            }
+        }).start();
+    }
+
     private void writeOperate(ChessboardPoint src, ChessboardPoint dest) throws IOException {
         ChessComponent chess = view.removeChessComponentAtGrid(src);
         if (model.hasChessPiece(dest)) {
             ChessComponent target = view.removeChessComponentAtGrid(dest);
             model.captureChessPiece(src, dest);
             view.setChessComponentAtGrid(dest, chess);
+            try {
+                startClip("capture");
+            } catch (LineUnavailableException e) {
+                throw new RuntimeException(e);
+            }
             stringWriter.append(String.format("(%s,%s) capture (%s,%s) from %s to %s\n", chess.getOwner(), chess.getName(), target.getOwner(), target.getName(), src, dest));
         } else {
             model.moveChessPiece(src, dest);
             view.setChessComponentAtGrid(dest, chess);
+            try {
+                startClip("move");
+            } catch (LineUnavailableException e) {
+                throw new RuntimeException(e);
+            }
             stringWriter.append(String.format("(%s,%s) move from %s to %s\n", chess.getOwner(), chess.getName(), src, dest));
         }
     }

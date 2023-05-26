@@ -7,6 +7,8 @@ import model.ChessPiece;
 import model.Chessboard;
 import model.ChessboardPoint;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -55,7 +57,7 @@ public class ChessboardComponent extends JComponent {
      * This method represents how to initiate ChessComponent
      * according to Chessboard information
      */
-    public void initiateChessComponent(Chessboard chessboard) {
+    public void initiateChessComponent(Chessboard chessboard) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         Cell[][] grid = chessboard.getGrid();
         for (int i = 0; i < CHESSBOARD_ROW_SIZE.getNum(); i++) {
             for (int j = 0; j < CHESSBOARD_COL_SIZE.getNum(); j++) {

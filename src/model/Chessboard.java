@@ -36,23 +36,23 @@ public class Chessboard {
     }
 
     private void initPieces() {
-        grid[0][0].setPiece(new ChessPiece(PlayerColor.RED, Name.狮, 7));
-        grid[0][6].setPiece(new ChessPiece(PlayerColor.RED, Name.虎, 6));
-        grid[1][1].setPiece(new ChessPiece(PlayerColor.RED, Name.狗, 3));
-        grid[1][5].setPiece(new ChessPiece(PlayerColor.RED, Name.猫, 2));
-        grid[2][0].setPiece(new ChessPiece(PlayerColor.RED, Name.鼠, 1));
-        grid[2][2].setPiece(new ChessPiece(PlayerColor.RED, Name.豹, 5));
-        grid[2][4].setPiece(new ChessPiece(PlayerColor.RED, Name.狼, 4));
-        grid[2][6].setPiece(new ChessPiece(PlayerColor.RED, Name.象, 8));
+        grid[0][0].setPiece(new ChessPiece(PlayerColor.RED, Name.lion, 7));
+        grid[0][6].setPiece(new ChessPiece(PlayerColor.RED, Name.tiger, 6));
+        grid[1][1].setPiece(new ChessPiece(PlayerColor.RED, Name.dog, 3));
+        grid[1][5].setPiece(new ChessPiece(PlayerColor.RED, Name.cat, 2));
+        grid[2][0].setPiece(new ChessPiece(PlayerColor.RED, Name.rat, 1));
+        grid[2][2].setPiece(new ChessPiece(PlayerColor.RED, Name.leo, 5));
+        grid[2][4].setPiece(new ChessPiece(PlayerColor.RED, Name.wolf, 4));
+        grid[2][6].setPiece(new ChessPiece(PlayerColor.RED, Name.elephant, 8));
 
-        grid[6][0].setPiece(new ChessPiece(PlayerColor.BLUE, Name.象, 8));
-        grid[6][2].setPiece(new ChessPiece(PlayerColor.BLUE, Name.狼, 4));
-        grid[6][4].setPiece(new ChessPiece(PlayerColor.BLUE, Name.豹, 5));
-        grid[6][6].setPiece(new ChessPiece(PlayerColor.BLUE, Name.鼠, 1));
-        grid[7][1].setPiece(new ChessPiece(PlayerColor.BLUE, Name.猫, 2));
-        grid[7][5].setPiece(new ChessPiece(PlayerColor.BLUE, Name.狗, 3));
-        grid[8][0].setPiece(new ChessPiece(PlayerColor.BLUE, Name.虎, 6));
-        grid[8][6].setPiece(new ChessPiece(PlayerColor.BLUE, Name.狮, 7));
+        grid[6][0].setPiece(new ChessPiece(PlayerColor.BLUE, Name.elephant, 8));
+        grid[6][2].setPiece(new ChessPiece(PlayerColor.BLUE, Name.wolf, 4));
+        grid[6][4].setPiece(new ChessPiece(PlayerColor.BLUE, Name.leo, 5));
+        grid[6][6].setPiece(new ChessPiece(PlayerColor.BLUE, Name.rat, 1));
+        grid[7][1].setPiece(new ChessPiece(PlayerColor.BLUE, Name.cat, 2));
+        grid[7][5].setPiece(new ChessPiece(PlayerColor.BLUE, Name.dog, 3));
+        grid[8][0].setPiece(new ChessPiece(PlayerColor.BLUE, Name.tiger, 6));
+        grid[8][6].setPiece(new ChessPiece(PlayerColor.BLUE, Name.lion, 7));
     }
 
     private void initTeam() {
@@ -92,14 +92,14 @@ public class Chessboard {
             for (int i = 1; i < Math.abs(x); i++) {
                 ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
                 ChessPiece chess = isRiver(point) ? getChessPieceAt(point) : null;
-                if (chess != null && chess.getName().equals(Name.鼠) && isRiver(point)) {
+                if (chess != null && chess.getName().equals(Name.rat) && isRiver(point)) {
                     return false;
                 }
             }
             for (int i = 1; i < Math.abs(y); i++) {
                 ChessboardPoint point = new ChessboardPoint(src.row() + d * i, src.col());
                 ChessPiece chess = isRiver(point) ? getChessPieceAt(point) : null;
-                if (chess != null && chess.getName().equals(Name.鼠) && isRiver(point)) {
+                if (chess != null && chess.getName().equals(Name.rat) && isRiver(point)) {
                     return false;
                 }
             }

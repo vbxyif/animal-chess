@@ -3,8 +3,11 @@ package view;
 
 import model.PlayerColor;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 /**
  * This is the equivalent of the ChessPiece class,
@@ -15,7 +18,7 @@ public class ChessComponent extends JComponent {
     private final PlayerColor owner;
     private boolean selected;
 
-    public ChessComponent(Name name, PlayerColor owner, int size) {
+    public ChessComponent(Name name, PlayerColor owner, int size) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
         this.name = name;
         this.owner = owner;
         this.selected = false;
@@ -58,6 +61,6 @@ public class ChessComponent extends JComponent {
 
 
     public enum Name {
-        鼠, 猫, 狗, 狼, 豹, 虎, 狮, 象,
+        rat, cat, dog, wolf, leo, tiger, lion, elephant,
     }
 }
