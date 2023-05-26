@@ -7,22 +7,23 @@ import model.Chessboard;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.util.Objects;
 
 /**
  * 这个类表示游戏过程中的整个游戏界面，是一切的载体
  */
 public class ChessGameFrame extends JFrame {
     private static ChessboardComponent chessboardComponent;
-    private final JButton againButton;
-    private final JButton ruleButton;
     private final int WIDTH;
     private final int HEIGTH;
     private JDialog dialog;
+    private MessageText roundText;
 
     public ChessGameFrame(int width, int height) {
-        setTitle("2023 CS109 Project Demo"); //设置标题
+        setTitle("2023 CS109 Project Animal Chess"); //设置标题
         this.WIDTH = width;
         this.HEIGTH = height;
+
         int ONE_CHESS_SIZE = (HEIGTH * 4 / 5) / 9;
 
         setSize(WIDTH, HEIGTH);
@@ -33,10 +34,8 @@ public class ChessGameFrame extends JFrame {
 
         addChessboard();
         addBackground();
-        againButton = new JButton("重新开始");
 
         addAgainButton();
-        ruleButton = new JButton("规则");
         addRuleButton();
         addSaveButton();
         addLoadButton();
@@ -51,9 +50,10 @@ public class ChessGameFrame extends JFrame {
     public void setChessboardComponent(ChessboardComponent chessboardComponent) {
         ChessGameFrame.chessboardComponent = chessboardComponent;
     }
-
+    /**在面板中添加背景
+     * */
     private void addBackground() {
-        ImageIcon bgp = new ImageIcon("src/animals/background.jpg");
+        ImageIcon bgp = new ImageIcon(Objects.requireNonNull(getClass().getResource("/animals/background.jpg")));
         JLabel bgl = new JLabel(bgp);
         bgl.setSize(WIDTH, HEIGTH);
         this.getLayeredPane().add(bgl, JLayeredPane.DEFAULT_LAYER);
@@ -78,7 +78,8 @@ public class ChessGameFrame extends JFrame {
         roundText.setFont(new Font("Black", Font.BOLD, 100));
         roundText.setLocation(HEIGTH, HEIGTH / 10);
         roundText.setEditable(false);
-        this.getLayeredPane().add(roundText, JLayeredPane.MODAL_LAYER);
+        this.roundText = roundText;
+        this.getLayeredPane().add(this.roundText, JLayeredPane.MODAL_LAYER);
     }
 
     private void addSaveText() {
@@ -97,9 +98,13 @@ public class ChessGameFrame extends JFrame {
         saveButton.setSize(WIDTH / 10, HEIGTH / 14);
         saveButton.addActionListener(e -> {
             try {
-                chessboardComponent.getGameController().save(textField.getText());
-                dialog.dispose();
-                JOptionPane.showMessageDialog(null, "保存成功");
+                if (chessboardComponent.getGameController().save(textField.getText())) {
+                    dialog.dispose();
+                    JOptionPane.showMessageDialog(null, "保存成功");
+                } else {
+                    JOptionPane.showMessageDialog(null, "保存失败，请重新命名");
+                    textField.setText("");
+                }
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "保存失败");
                 throw new RuntimeException(ex);
@@ -108,7 +113,7 @@ public class ChessGameFrame extends JFrame {
         dialog.add(saveButton, BorderLayout.EAST);
     }
 
-    //*Create a button named saveButton*//
+    /**Create a button named saveButton*/
     private void addSaveButton() {
         //*Create a button named saveButton*//
         JButton saveButton = new JButton("保存");
@@ -123,6 +128,8 @@ public class ChessGameFrame extends JFrame {
     }
 
     private void addLoadDialog() {
+        /*Create a dialog to read a save file
+         */
         dialog = new JDialog();
         dialog.setTitle("读取存档");
         dialog.setSize(WIDTH / 3, HEIGTH / 2);
@@ -156,12 +163,16 @@ public class ChessGameFrame extends JFrame {
         JScrollPane scrollPane = new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setSize(WIDTH / 3, HEIGTH / 3);
         dialog.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel buttonPane = new JPanel();
+        buttonPane.setLayout(new FlowLayout());
         JButton okButton = new JButton("确定");
-        okButton.setSize(WIDTH / 5, HEIGTH / 6);
+        okButton.setSize(WIDTH / 10, HEIGTH / 6);
         okButton.addActionListener(e -> {
             try {
                 GameController gameController = againController();
                 gameController.load("src/saves/" + str[0]);
+                addRoundText(gameController.getRoundText());
                 dialog.dispose();
                 JOptionPane.showMessageDialog(null, "加载成功");
             } catch (IOException ex) {
@@ -169,10 +180,31 @@ public class ChessGameFrame extends JFrame {
                 throw new RuntimeException(ex);
             }
         });
-        dialog.add(okButton, BorderLayout.SOUTH);
+        buttonPane.add(okButton);
+        JButton deleteButton = new JButton("删除");
+        deleteButton.setSize(WIDTH / 10, HEIGTH / 6);
+        deleteButton.addActionListener(e -> {
+            try {
+                GameController gameController = againController();
+                if (gameController.delete("src/saves/" + str[0])) {
+                    addRoundText(gameController.getRoundText());
+                    dialog.dispose();
+                    JOptionPane.showMessageDialog(null, "删除成功");
+                } else {
+                    JOptionPane.showMessageDialog(null, "删除失败");
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "删除失败");
+                throw new RuntimeException(ex);
+            }
+        });
+        buttonPane.add(deleteButton);
+        dialog.add(buttonPane, BorderLayout.SOUTH);
         dialog.setVisible(true);
     }
-
+    /**create a button named loadButton
+     * click the button to load
+     * */
     private void addLoadButton() {
         JButton loadButton = new JButton("加载");
         loadButton.addActionListener(e -> addLoadDialog());
@@ -181,13 +213,21 @@ public class ChessGameFrame extends JFrame {
         loadButton.setFont(new Font("Rockwell", Font.BOLD, 20));
         this.getLayeredPane().add(loadButton, JLayeredPane.MODAL_LAYER);
     }
-
+    /**create a button named undoButton
+     * click the button to undo
+     * */
     private void addUndoButton() {
         JButton undoButton = new JButton("悔棋");
         undoButton.addActionListener(e -> {
             if (chessboardComponent.getGameController().canUndo()) {
-                GameController gameController = againController();
+                GameController gameController;
+                try {
+                    gameController = againController();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
                 gameController.undo();
+                addRoundText(gameController.getRoundText());
             } else {
                 JOptionPane.showMessageDialog(null, "悔棋失败");
             }
@@ -198,7 +238,11 @@ public class ChessGameFrame extends JFrame {
         this.getLayeredPane().add(undoButton, JLayeredPane.MODAL_LAYER);
     }
 
+    /**create a button named ruleButton
+     * click the button to open the rule
+     * */
     private void addRuleButton() {
+        JButton ruleButton = new JButton("规则");
         ruleButton.addActionListener(e -> {
             try {
                 StringBuilder messageText = new StringBuilder();
@@ -227,17 +271,28 @@ public class ChessGameFrame extends JFrame {
     }
 
     /**
-     * 在游戏面板中增加一个按钮，如果按下的话就会显示Hello, world!
+     * 在游戏面板中增加一个按钮，如果按下的话就会重置游戏
      */
 
     private void addAgainButton() {
-        againButton.addActionListener((e) -> againController());
+        JButton againButton = new JButton("重新开始");
+        againButton.addActionListener((e) -> {
+            try {
+                againController();
+                addRoundText(chessboardComponent.getGameController().getRoundText());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         againButton.setLocation(HEIGTH, HEIGTH / 10 + 120);
         againButton.setSize(200, 60);
         againButton.setFont(new Font("Rockwell", Font.BOLD, 20));
         this.getLayeredPane().add(againButton, JLayeredPane.MODAL_LAYER);
     }
 
+    /**
+     * 在游戏面板中增加一个按钮，如果按下的话就退出
+     * */
     private void addExitButton() {
         JButton exitButton = new JButton("退出");
         exitButton.addActionListener((e) -> System.exit(0));
@@ -247,18 +302,16 @@ public class ChessGameFrame extends JFrame {
         this.getLayeredPane().add(exitButton, JLayeredPane.MODAL_LAYER);
     }
 
-    public GameController againController() {
-        this.dispose();
-        ChessGameFrame mainFrame = new ChessGameFrame(1100, 810);
-        GameController gameController;
-        try {
-            gameController = new GameController(getChessboardComponent(), new Chessboard(), new MessageText("1", Color.BLUE));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        mainFrame.addRoundText(gameController.getRoundText());
-        mainFrame.setVisible(true);
-        return gameController;
+    /**
+     * 重置游戏
+     */
+
+    public GameController againController() throws IOException {
+        getLayeredPane().remove(chessboardComponent);
+        chessboardComponent.reset(new Chessboard());
+        getLayeredPane().add(chessboardComponent, JLayeredPane.MODAL_LAYER);
+        getLayeredPane().remove(roundText);
+        return chessboardComponent.getGameController();
     }
 
 }

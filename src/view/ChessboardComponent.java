@@ -10,6 +10,7 @@ import model.ChessboardPoint;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,7 +60,7 @@ public class ChessboardComponent extends JComponent {
         for (int i = 0; i < CHESSBOARD_ROW_SIZE.getNum(); i++) {
             for (int j = 0; j < CHESSBOARD_COL_SIZE.getNum(); j++) {
                 // TODO: Implement the initialization checkerboard —— Done
-
+                gridComponents[i][j].removeAll();
                 if (grid[i][j].getPiece() != null) {
                     ChessPiece chessPiece = grid[i][j].getPiece();
                     System.out.println(chessPiece.getOwner().toString() + chessPiece.getName());
@@ -71,6 +72,11 @@ public class ChessboardComponent extends JComponent {
             }
         }
 
+    }
+
+    public void reset(Chessboard chessboard) throws IOException {
+        int round = (int) getGameController().getRound();
+        this.gameController = new GameController(this, chessboard, new MessageText(String.valueOf(round), this.gameController.getCurrentPlayer().getColor()), round);
     }
 
     public Set<ChessboardPoint> getRiversideCell() {

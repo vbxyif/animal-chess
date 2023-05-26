@@ -6,6 +6,7 @@ import model.Chessboard;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.util.Objects;
 
 public class BeginFrame extends JFrame {
     public final int WIDTH;
@@ -25,7 +26,7 @@ public class BeginFrame extends JFrame {
         layeredPane.setSize(WIDTH, HEIGHT);
         layeredPane.setLayout(new GridBagLayout());
 
-        JLabel tittleLabel = new JLabel(new ImageIcon("src/animals/logo.png"), JLabel.CENTER);
+        JLabel tittleLabel = new JLabel(new ImageIcon(Objects.requireNonNull(getClass().getResource("/animals/logo.png"))), JLabel.CENTER);
         tittleLabel.setSize(WIDTH, HEIGHT);
 
 
@@ -43,7 +44,7 @@ public class BeginFrame extends JFrame {
             ChessGameFrame mainFrame = new ChessGameFrame(1100, 810);
             GameController gameController;
             try {
-                gameController = new GameController(ChessGameFrame.getChessboardComponent(), new Chessboard(), new MessageText("1", Color.BLUE));
+                gameController = new GameController(ChessGameFrame.getChessboardComponent(), new Chessboard(), new MessageText("1", Color.BLUE), 1);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

@@ -87,8 +87,8 @@ public class Chessboard {
     private boolean isRiverNoRat(ChessboardPoint src, ChessboardPoint dest) {
         int x = dest.col() - src.col();
         int y = dest.row() - src.row();
+        int d = x != 0 ? x / Math.abs(x) : y / Math.abs(y);
         if ((x == 0 || y == 0) && !(x == 0 && y == 0)) {
-            int d = x != 0 ? x / Math.abs(x) : y / Math.abs(y);
             for (int i = 1; i < Math.abs(x); i++) {
                 ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
                 ChessPiece chess = isRiver(point) ? getChessPieceAt(point) : null;
@@ -97,7 +97,7 @@ public class Chessboard {
                 }
             }
             for (int i = 1; i < Math.abs(y); i++) {
-                ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
+                ChessboardPoint point = new ChessboardPoint(src.row() + d * i, src.col());
                 ChessPiece chess = isRiver(point) ? getChessPieceAt(point) : null;
                 if (chess != null && chess.getName().equals(Name.鼠) && isRiver(point)) {
                     return false;

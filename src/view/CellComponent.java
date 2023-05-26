@@ -2,6 +2,7 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * This is the equivalent of the Cell class,
@@ -36,7 +37,7 @@ public class CellComponent extends JPanel {
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
         g.setColor(Color.lightGray);
         g.drawRect(0, 0, this.getWidth(), this.getHeight());
-        Image image = new ImageIcon(String.format("src/animals/%s.png", name)).getImage();
+        Image image = new ImageIcon(Objects.requireNonNull(getClass().getResource(String.format("/animals/%s.png", name)))).getImage();
 
         if (isValidMove()) {
             g.setColor(new Color(134, 231, 90));

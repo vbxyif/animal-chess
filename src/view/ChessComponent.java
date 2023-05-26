@@ -5,6 +5,7 @@ import model.PlayerColor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * This is the equivalent of the ChessPiece class,
@@ -47,10 +48,11 @@ public class ChessComponent extends JComponent {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         String name = this.name.toString();
         String color = this.owner.toString();
-        Image image = new ImageIcon(String.format("src/animals/%s%s.png", name, color)).getImage();
+        Image image = new ImageIcon(Objects.requireNonNull(getClass().getResource(String.format("/animals/%s%s.png", name, color)))).getImage();
         g2.drawImage(image, getWidth() / 6, getHeight() / 6, this);
         // FIXME: Use library to find the correct offset.--Done
-        if (isSelected()) { // Highlights the model if selected.
+        if (isSelected()) {
+            // Highlights the model if selected.
             g.setColor(Color.RED);
             g.drawOval(0, 0, getWidth() - 1, getHeight() - 1);
         }

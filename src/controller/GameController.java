@@ -39,20 +39,18 @@ public class GameController implements GameListener {
     public static SavesFileWriter savesFileWriter;
     public static FileReader savesFileReader;
     private static StringBuilder stringWriter = new StringBuilder();
-    public int loading = 0;
 
 
-    public GameController(ChessboardComponent view, Chessboard model, MessageText roundText) throws IOException {
+    public GameController(ChessboardComponent view, Chessboard model, MessageText roundText, int round) throws IOException {
         this.view = view;
         this.model = model;
         this.roundText = roundText;
         this.currentPlayer = PlayerColor.BLUE;
 
         view.registerController(this);
-        //initialize();
         view.initiateChessComponent(model);
         view.repaint();
-        round = 1;
+        this.round = round;
     }
 
     public boolean canUndo() {
@@ -80,7 +78,6 @@ public class GameController implements GameListener {
                 stringWriter.append(line).append("\n");
             }
         }
-        view.repaint();
         stringWriter = new StringBuilder();
         for (String line : lines) {
             if (line.equals(lines[lines.length - 1])) {
@@ -88,18 +85,28 @@ public class GameController implements GameListener {
             }
             stringWriter.append(line).append("\n");
         }
+        round = round - 0.5;
         roundText.setText(String.valueOf((int) round));
         roundText.setForeground(currentPlayer.getColor());
         view.repaint();
     }
 
-    public void save(String str) throws IOException {
+    public boolean save(String str) throws IOException {
+        boolean result;
         File newGameFile = new File(String.format("src/saves/%s.txt", str));
+        if (newGameFile.createNewFile()) {
+            System.out.println("文件创建成功");
+            result = true;
+        } else {
+            System.out.println("文件创建失败");
+            result = false;
+        }
         savesFileWriter = new SavesFileWriter(newGameFile);
         savesFileWriter.write(stringWriter.toString());
         savesFileWriter.write(round + "\n");
         savesFileWriter.write(currentPlayer.toString());
         savesFileWriter.close();
+        return result;
     }
 
     public void load(String str) throws IOException {
@@ -112,7 +119,8 @@ public class GameController implements GameListener {
                 round = Double.parseDouble(line);
                 line = " ";
             } else if(line.matches("\\D")){
-                currentPlayer = line.equals("BLUE") ? PlayerColor.BLUE : PlayerColor.RED;
+                currentPlayer = line.equals("B") ? PlayerColor.BLUE : PlayerColor.RED;
+                System.out.println(currentPlayer);
                 break;
             }else if (match(line)) {
                 matchCapture(line);
@@ -128,7 +136,17 @@ public class GameController implements GameListener {
         roundText.setText(String.valueOf((int) round));
         roundText.setForeground(currentPlayer.getColor());
         view.repaint();
-        loading++;
+    }
+
+    public boolean delete(String str) throws IOException {
+        File newGameFile = new File(str);
+        if (newGameFile.delete()) {
+            System.out.println("删除成功");
+            return true;
+        } else {
+            System.out.println("删除失败");
+            return false;
+        }
     }
 
     private ChessboardPoint text2point(String text) {
@@ -168,7 +186,6 @@ public class GameController implements GameListener {
         ChessComponent chess = view.removeChessComponentAtGrid(srcPoint);
         model.moveChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
-        swapColor();
     }
 
     private void matchCapture(String str) {
@@ -190,7 +207,6 @@ public class GameController implements GameListener {
         view.removeChessComponentAtGrid(destPoint);
         model.captureChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
-        swapColor();
     }
 
     // after a valid move swap the player
@@ -199,6 +215,14 @@ public class GameController implements GameListener {
         round += 0.5;
         roundText.setText(String.valueOf((int) round));
         roundText.setForeground(currentPlayer.getColor());
+    }
+
+    public double getRound() {
+        return round;
+    }
+
+    public PlayerColor getCurrentPlayer() {
+        return currentPlayer;
     }
 
     public MessageText getRoundText() {
