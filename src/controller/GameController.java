@@ -44,6 +44,8 @@ public class GameController implements GameListener {
     public static SavesFileWriter savesFileWriter;
     public static FileReader savesFileReader;
     private static StringBuilder stringWriter = new StringBuilder();
+    private Clip chessClip;
+    private Clip backgroundClip;
 
 
     public GameController(ChessboardComponent view, Chessboard model) throws IOException {
@@ -52,7 +54,8 @@ public class GameController implements GameListener {
         this.currentPlayer = PlayerColor.BLUE;
         round = stringWriter.toString().split("\n").length * 0.5 + 1;
         this.roundText = new MessageText(String.valueOf((int) round), currentPlayer.getColor());
-
+        setBackgroundClip("background");
+        backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
         view.registerController(this);
         try {
             view.initiateChessComponent(model);
@@ -60,6 +63,15 @@ public class GameController implements GameListener {
             throw new RuntimeException(e);
         }
         view.repaint();
+    }
+
+    private void setBackgroundClip(String str) {
+        try {
+            backgroundClip = AudioSystem.getClip();
+            backgroundClip.open(AudioSystem.getAudioInputStream(new File("src/wav/" + str + ".wav")));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void restart() {
@@ -278,14 +290,18 @@ public class GameController implements GameListener {
         view.disableEvents();
     }
 
+    public Clip getChessClip() {
+        return chessClip;
+    }
+
     private void startClip(String str) throws LineUnavailableException {
-        Clip clip = AudioSystem.getClip();
+        chessClip = AudioSystem.getClip();
         try {
-            clip.open(AudioSystem.getAudioInputStream(new File("src/wav/" + str +".wav")));
+            chessClip.open(AudioSystem.getAudioInputStream(new File("src/wav/" + str +".wav")));
         } catch (IOException | UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         }
-        new Thread(clip::start).start();
+        new Thread(chessClip::start).start();
     }
 
     private void writeOperate(ChessboardPoint src, ChessboardPoint dest) throws IOException {
