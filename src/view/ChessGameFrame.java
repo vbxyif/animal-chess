@@ -168,13 +168,13 @@ public class ChessGameFrame extends JFrame {
         JButton okButton = new JButton("确定");
         okButton.setSize(WIDTH / 10, HEIGTH / 6);
         okButton.addActionListener(e -> {
+            dialog.dispose();
             try {
                 GameController gameController = againController();
                 gameController.load("src/saves/" + str[0]);
-                dialog.dispose();
-                JOptionPane.showMessageDialog(null, "加载成功");
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "加载失败");
+                dialog.setVisible(true);
                 throw new RuntimeException(ex);
             }
         });

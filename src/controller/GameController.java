@@ -10,6 +10,7 @@ import view.ChessComponent;
 import view.ChessboardComponent;
 import view.MessageText;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -56,6 +57,16 @@ public class GameController implements GameListener {
     public void restart() {
         stringWriter = new StringBuilder();
         changeText();
+    }
+
+    private void animation() {
+        view.paintImmediately(0, 0, view.getWidth(), view.getHeight());
+        changeText();
+        try {
+            Thread.sleep(400);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean canUndo() {
@@ -118,25 +129,34 @@ public class GameController implements GameListener {
         File newGameFile = new File(str);
         savesFileReader = new FileReader(newGameFile);
         BufferedReader bufferedReader = new BufferedReader(savesFileReader);
-        for (String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine()) {
-            if (line.matches("\\d+.\\d")) {
-                round = Double.parseDouble(line);
-                line = " ";
-            } else if(line.matches("\\D")){
-                currentPlayer = line.equals("B") ? PlayerColor.BLUE : PlayerColor.RED;
-                System.out.println(currentPlayer);
-                break;
-            }else if (match(line)) {
-                matchCapture(line);
-            } else {
-                matchMove(line);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for (String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine()) {
+                        if (line.matches("\\d+.\\d")) {
+                            round = Double.parseDouble(line);
+                            line = " ";
+                        } else if(line.matches("\\D")){
+                            currentPlayer = line.equals("BLUE") ? PlayerColor.BLUE : PlayerColor.RED;
+                            line = " ";
+                        }else if (match(line)) {
+                            matchCapture(line);
+                        } else {
+                            matchMove(line);
+                        }
+                        if (!line.equals(" ")) {
+                            stringWriter.append(line).append("\n");
+                        }
+                    }
+                    bufferedReader.close();
+                    savesFileReader.close();
+                    JOptionPane.showMessageDialog(null, "加载成功");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
-            if (!line.equals(" ")) {
-                stringWriter.append(line).append("\n");
-            }
-        }
-        bufferedReader.close();
-        savesFileReader.close();
+        } ).start();
         roundText.setText(String.valueOf((int) round));
         roundText.setForeground(currentPlayer.getColor());
         view.repaint();
@@ -191,6 +211,7 @@ public class GameController implements GameListener {
         model.moveChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
         swapColor();
+        animation();
     }
 
     private void matchCapture(String str) {
@@ -213,6 +234,7 @@ public class GameController implements GameListener {
         model.captureChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
         swapColor();
+        animation();
     }
 
     // after a valid move swap the player
@@ -222,9 +244,14 @@ public class GameController implements GameListener {
     }
 
     private void changeText() {
-        round = stringWriter.toString().split("\n").length * 0.5 + 1;
-        roundText.setText(String.valueOf((int) round));
-        roundText.setForeground(currentPlayer.getColor());
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                round = stringWriter.toString().split("\n").length * 0.5 + 1;
+                roundText.setText(String.valueOf((int) round));
+                roundText.setForeground(currentPlayer.getColor());
+            }
+        });
     }
 
     public MessageText getRoundText() {
