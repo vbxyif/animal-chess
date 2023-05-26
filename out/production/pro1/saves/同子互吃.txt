@@ -1,2 +1,7 @@
-1.0
-B
+(B,狼) move from (6,2) to (6,3)
+(R,狼) move from (2,4) to (2,3)
+(B,狼) move from (6,3) to (5,3)
+(R,狼) move from (2,3) to (3,3)
+(B,狼) move from (5,3) to (4,3)
+3.5
+R

@@ -183,8 +183,7 @@ public class ChessGameFrame extends JFrame {
         deleteButton.setSize(WIDTH / 10, HEIGTH / 6);
         deleteButton.addActionListener(e -> {
             try {
-                GameController gameController = againController();
-                if (gameController.delete("src/saves/" + str[0])) {
+                if (chessboardComponent.getGameController().delete("src/saves/" + str[0])) {
                     dialog.dispose();
                     JOptionPane.showMessageDialog(null, "删除成功");
                 } else {

@@ -60,7 +60,7 @@ public class ChessboardComponent extends JComponent {
         for (int i = 0; i < CHESSBOARD_ROW_SIZE.getNum(); i++) {
             for (int j = 0; j < CHESSBOARD_COL_SIZE.getNum(); j++) {
                 // TODO: Implement the initialization checkerboard —— Done
-
+                gridComponents[i][j].removeAll();
                 if (grid[i][j].getPiece() != null) {
                     ChessPiece chessPiece = grid[i][j].getPiece();
                     System.out.println(chessPiece.getOwner().toString() + chessPiece.getName());
@@ -75,11 +75,6 @@ public class ChessboardComponent extends JComponent {
     }
 
     public void reset(Chessboard chessboard) throws IOException {
-        for (int i = 0; i < CHESSBOARD_ROW_SIZE.getNum(); i++) {
-            for (int j = 0; j < CHESSBOARD_COL_SIZE.getNum(); j++) {
-                gridComponents[i][j].removeAll();
-            }
-        }
         this.gameController = new GameController(this, chessboard,new MessageText("1", Color.BLUE));
     }
 

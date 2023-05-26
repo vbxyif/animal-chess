@@ -97,7 +97,7 @@ public class Chessboard {
                 }
             }
             for (int i = 1; i < Math.abs(y); i++) {
-                ChessboardPoint point = new ChessboardPoint(src.row(), src.col() + d * i);
+                ChessboardPoint point = new ChessboardPoint(src.row() + d * i, src.col());
                 ChessPiece chess = isRiver(point) ? getChessPieceAt(point) : null;
                 if (chess != null && chess.getName().equals(Name.鼠) && isRiver(point)) {
                     return false;
