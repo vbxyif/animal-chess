@@ -274,6 +274,7 @@ public class ChessGameFrame extends JFrame {
         againButton.addActionListener((e) -> {
             try {
                 againController();
+                chessboardComponent.getGameController().restart();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

@@ -46,11 +46,16 @@ public class GameController implements GameListener {
         this.model = model;
         this.currentPlayer = PlayerColor.BLUE;
         round = stringWriter.toString().split("\n").length * 0.5 + 1;
-        this.roundText = new MessageText(String.valueOf(round), currentPlayer.getColor());
+        this.roundText = new MessageText(String.valueOf((int) round), currentPlayer.getColor());
 
         view.registerController(this);
         view.initiateChessComponent(model);
         view.repaint();
+    }
+
+    public void restart() {
+        stringWriter = new StringBuilder();
+        changeText();
     }
 
     public boolean canUndo() {
@@ -92,7 +97,7 @@ public class GameController implements GameListener {
 
     public boolean save(String str) throws IOException {
         boolean result;
-        File newGameFile = new File(String.format("src/saves/%s.txt", str));
+        File newGameFile = new File(String.format("/saves/%s.txt", str));
         if (newGameFile.createNewFile()) {
             System.out.println("文件创建成功");
             result = true;
