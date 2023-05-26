@@ -229,10 +229,10 @@ public class ChessGameFrame extends JFrame {
                 GameController gameController;
                 try {
                     gameController = againController();
+                    gameController.undo();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
-                gameController.undo();
             } else {
                 JOptionPane.showMessageDialog(null, "悔棋失败");
             }
@@ -323,6 +323,7 @@ public class ChessGameFrame extends JFrame {
         chessboardComponent.reset(new Chessboard());
         getLayeredPane().add(chessboardComponent, JLayeredPane.MODAL_LAYER);
         GameController gameController = chessboardComponent.getGameController();
+        gameController.getBackgroundClip().close();
         getLayeredPane().remove(roundText);
         addRoundText(gameController.getRoundText());
         return chessboardComponent.getGameController();

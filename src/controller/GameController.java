@@ -74,6 +74,10 @@ public class GameController implements GameListener {
         }
     }
 
+    public Clip getBackgroundClip() {
+        return backgroundClip;
+    }
+
     public void restart() {
         for (CellComponent[] cells : view.getGridComponents()) {
             for (CellComponent cell : cells) {
@@ -90,33 +94,23 @@ public class GameController implements GameListener {
 
     public void undo() {
         String[] lines = stringWriter.toString().split("\n");
+        stringWriter = new StringBuilder();
         for (String line : lines) {
+            System.out.println(line);
             if (line.equals(lines[lines.length - 1])) {
                 break;
-            }
-            if (line.matches("\\d+.\\d")) {
-                round = Double.parseDouble(line);
-                line = " ";
-            } else if(line.matches("\\D")){
-                currentPlayer = line.equals("BLUE") ? PlayerColor.BLUE : PlayerColor.RED;
-                line = " ";
-            }else if (match(line)) {
+            } else if (line.matches("\\d+.\\d")) {
+                continue;
+            } else if (match(line)) {
                 matchCapture(line);
             } else {
                 matchMove(line);
             }
-            if (!line.equals(" ")) {
-                stringWriter.append(line).append("\n");
-            }
-        }
-        stringWriter = new StringBuilder();
-        for (String line : lines) {
-            if (line.equals(lines[lines.length - 1])) {
-                break;
-            }
             stringWriter.append(line).append("\n");
         }
+
         System.out.println(round + " " + lines.length);
+        System.out.println(stringWriter.toString());
         changeText();
         view.repaint();
     }
@@ -140,6 +134,7 @@ public class GameController implements GameListener {
     }
 
     public void load(String str) throws IOException {
+        backgroundClip.close();
         stringWriter = new StringBuilder();
         File newGameFile = new File(str);
         savesFileReader = new FileReader(newGameFile);
@@ -176,8 +171,8 @@ public class GameController implements GameListener {
                 }
             }
         } ).start();
-        roundText.setText(String.valueOf((int) round));
-        roundText.setForeground(currentPlayer.getColor());
+        /*roundText.setText(String.valueOf((int) round));
+        roundText.setForeground(currentPlayer.getColor());*/
         view.repaint();
     }
 
@@ -206,14 +201,14 @@ public class GameController implements GameListener {
 
     //regex to match the stringWriter
     private boolean match(String str) {
-        String pattern = "(\\(\\D,\\D\\)) move from (\\(\\d,\\d\\)) to (\\(\\d,\\d\\))";
+        String pattern = "(\\(\\D,\\D+\\)) move from (\\(\\d,\\d\\)) to (\\(\\d,\\d\\))";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(str);
         return !m.find();
     }
     private void matchMove(String str) {
 
-        String pattern = "(\\(\\D,\\D\\)) move from (\\(\\d,\\d\\)) to (\\(\\d,\\d\\))";
+        String pattern = "(\\(\\D,\\D+\\)) move from (\\(\\d,\\d\\)) to (\\(\\d,\\d\\))";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(str);
         String src = "";
@@ -234,7 +229,7 @@ public class GameController implements GameListener {
 
     private void matchCapture(String str) {
 
-        String pattern = "(\\(\\D,\\D\\)) capture (\\(\\D,\\D\\)) from (\\(\\d,\\d\\)) to (\\(\\d,\\d\\))";
+        String pattern = "(\\(\\D,\\D+\\)) capture (\\(\\D,\\D\\)) from (\\(\\d,\\d\\)) to (\\(\\d,\\d\\))";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(str);
         String src = "";
