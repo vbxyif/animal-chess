@@ -63,7 +63,6 @@ public class ChessboardComponent extends JComponent {
                 gridComponents[i][j].removeAll();
                 if (grid[i][j].getPiece() != null) {
                     ChessPiece chessPiece = grid[i][j].getPiece();
-                    System.out.println(chessPiece.getOwner().toString() + chessPiece.getName());
                     gridComponents[i][j].add(
                             new ChessComponent(chessPiece.getName(),
                                     chessPiece.getOwner(),
@@ -75,7 +74,7 @@ public class ChessboardComponent extends JComponent {
     }
 
     public void reset(Chessboard chessboard) throws IOException {
-        this.gameController = new GameController(this, chessboard,new MessageText("1", Color.BLUE));
+        this.gameController = new GameController(this, chessboard);
     }
 
     public Set<ChessboardPoint> getRiversideCell() {

@@ -41,16 +41,16 @@ public class GameController implements GameListener {
     private static StringBuilder stringWriter = new StringBuilder();
 
 
-    public GameController(ChessboardComponent view, Chessboard model, MessageText roundText) throws IOException {
+    public GameController(ChessboardComponent view, Chessboard model) throws IOException {
         this.view = view;
         this.model = model;
-        this.roundText = roundText;
         this.currentPlayer = PlayerColor.BLUE;
+        round = stringWriter.toString().split("\n").length * 0.5 + 1;
+        this.roundText = new MessageText(String.valueOf(round), currentPlayer.getColor());
 
         view.registerController(this);
         view.initiateChessComponent(model);
         view.repaint();
-        round = 1;
     }
 
     public boolean canUndo() {
@@ -85,8 +85,8 @@ public class GameController implements GameListener {
             }
             stringWriter.append(line).append("\n");
         }
-        roundText.setText(String.valueOf((int) round));
-        roundText.setForeground(currentPlayer.getColor());
+        System.out.println(round + " " + lines.length);
+        changeText();
         view.repaint();
     }
 
@@ -185,6 +185,7 @@ public class GameController implements GameListener {
         ChessComponent chess = view.removeChessComponentAtGrid(srcPoint);
         model.moveChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
+        swapColor();
     }
 
     private void matchCapture(String str) {
@@ -206,12 +207,17 @@ public class GameController implements GameListener {
         view.removeChessComponentAtGrid(destPoint);
         model.captureChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
+        swapColor();
     }
 
     // after a valid move swap the player
     private void swapColor() {
         currentPlayer = currentPlayer == PlayerColor.BLUE ? PlayerColor.RED : PlayerColor.BLUE;
-        round += 0.5;
+        changeText();
+    }
+
+    private void changeText() {
+        round = stringWriter.toString().split("\n").length * 0.5 + 1;
         roundText.setText(String.valueOf((int) round));
         roundText.setForeground(currentPlayer.getColor());
     }

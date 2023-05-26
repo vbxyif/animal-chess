@@ -43,7 +43,7 @@ public class BeginFrame extends JFrame {
             ChessGameFrame mainFrame = new ChessGameFrame(1100, 810);
             GameController gameController;
             try {
-                gameController = new GameController(ChessGameFrame.getChessboardComponent(), new Chessboard(), new MessageText("1", Color.BLUE));
+                gameController = new GameController(ChessGameFrame.getChessboardComponent(), new Chessboard());
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
