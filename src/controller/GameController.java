@@ -10,10 +10,7 @@ import view.ChessComponent;
 import view.ChessboardComponent;
 import view.MessageText;
 
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
@@ -224,6 +221,7 @@ public class GameController implements GameListener {
         ChessComponent chess = view.removeChessComponentAtGrid(srcPoint);
         model.moveChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
+        startClip("move");
         swapColor();
     }
 
@@ -246,6 +244,7 @@ public class GameController implements GameListener {
         view.removeChessComponentAtGrid(destPoint);
         model.captureChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
+        startClip("capture");
         swapColor();
     }
 
@@ -278,6 +277,8 @@ public class GameController implements GameListener {
     }
 
     private void afterWin() {
+        backgroundClip.stop();
+        startClip("win");
         System.out.println("游戏结束！");
         //JOptionPane.showMessageDialog(null,"游戏结束！");
         roundText.setFont(new Font("Black", Font.BOLD, 100));
@@ -289,11 +290,11 @@ public class GameController implements GameListener {
         return chessClip;
     }
 
-    private void startClip(String str) throws LineUnavailableException {
-        chessClip = AudioSystem.getClip();
+    private void startClip(String str) {
         try {
+            chessClip = AudioSystem.getClip();
             chessClip.open(AudioSystem.getAudioInputStream(new File("src/wav/" + str +".wav")));
-        } catch (IOException | UnsupportedAudioFileException e) {
+        } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
             throw new RuntimeException(e);
         }
         new Thread(chessClip::start).start();
@@ -305,20 +306,12 @@ public class GameController implements GameListener {
             ChessComponent target = view.removeChessComponentAtGrid(dest);
             model.captureChessPiece(src, dest);
             view.setChessComponentAtGrid(dest, chess);
-            try {
-                startClip("capture");
-            } catch (LineUnavailableException e) {
-                throw new RuntimeException(e);
-            }
+            startClip("capture");
             stringWriter.append(String.format("(%s,%s) capture (%s,%s) from %s to %s\n", chess.getOwner(), chess.getName(), target.getOwner(), target.getName(), src, dest));
         } else {
             model.moveChessPiece(src, dest);
             view.setChessComponentAtGrid(dest, chess);
-            try {
-                startClip("move");
-            } catch (LineUnavailableException e) {
-                throw new RuntimeException(e);
-            }
+            startClip("move");
             stringWriter.append(String.format("(%s,%s) move from %s to %s\n", chess.getOwner(), chess.getName(), src, dest));
         }
     }
