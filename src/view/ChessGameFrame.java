@@ -182,16 +182,18 @@ public class ChessGameFrame extends JFrame {
         JButton deleteButton = new JButton("删除");
         deleteButton.setSize(WIDTH / 10, HEIGTH / 6);
         deleteButton.addActionListener(e -> {
-            try {
-                if (chessboardComponent.getGameController().delete("src/saves/" + str[0])) {
-                    dialog.dispose();
-                    JOptionPane.showMessageDialog(null, "删除成功");
-                } else {
+            if (JOptionPane.showConfirmDialog(null, "确定删除存档?") == JOptionPane.OK_OPTION) {
+                try {
+                    if (chessboardComponent.getGameController().delete("src/saves/" + str[0])) {
+                        dialog.dispose();
+                        JOptionPane.showMessageDialog(null, "删除成功");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "删除失败");
+                    }
+                } catch (IOException ex) {
                     JOptionPane.showMessageDialog(null, "删除失败");
+                    throw new RuntimeException(ex);
                 }
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(null, "删除失败");
-                throw new RuntimeException(ex);
             }
         });
         buttonPane.add(deleteButton);
@@ -273,8 +275,10 @@ public class ChessGameFrame extends JFrame {
         JButton againButton = new JButton("重新开始");
         againButton.addActionListener((e) -> {
             try {
-                againController();
-                chessboardComponent.getGameController().restart();
+                if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null, "您确定要重新开始吗?", "提示", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
+                    againController();
+                    chessboardComponent.getGameController().restart();
+                }
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -290,7 +294,11 @@ public class ChessGameFrame extends JFrame {
      * */
     private void addExitButton() {
         JButton exitButton = new JButton("退出");
-        exitButton.addActionListener((e) -> System.exit(0));
+        exitButton.addActionListener((e) -> {
+            if (JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null, "您确定要退出吗?", "提示", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
+                System.exit(0);
+            }
+        });
         exitButton.setLocation(HEIGTH, HEIGTH / 10 + 550);
         exitButton.setSize(200, 60);
         exitButton.setFont(new Font("Rockwell", Font.BOLD, 20));
