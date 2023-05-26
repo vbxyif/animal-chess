@@ -55,18 +55,13 @@ public class GameController implements GameListener {
     }
 
     public void restart() {
+        for (CellComponent[] cells : view.getGridComponents()) {
+            for (CellComponent cell : cells) {
+                cell.setValidMove(false);
+            }
+        }
         stringWriter = new StringBuilder();
         changeText();
-    }
-
-    private void animation() {
-        view.paintImmediately(0, 0, view.getWidth(), view.getHeight());
-        changeText();
-        try {
-            Thread.sleep(400);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public boolean canUndo() {
@@ -108,7 +103,7 @@ public class GameController implements GameListener {
 
     public boolean save(String str) throws IOException {
         boolean result;
-        File newGameFile = new File(String.format("/saves/%s.txt", str));
+        File newGameFile = new File(String.format("src/saves/%s.txt", str));
         if (newGameFile.createNewFile()) {
             System.out.println("文件创建成功");
             result = true;
@@ -134,19 +129,23 @@ public class GameController implements GameListener {
             public void run() {
                 try {
                     for (String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine()) {
+                        changeText();
                         if (line.matches("\\d+.\\d")) {
                             round = Double.parseDouble(line);
-                            line = " ";
+                            continue;
                         } else if(line.matches("\\D")){
-                            currentPlayer = line.equals("BLUE") ? PlayerColor.BLUE : PlayerColor.RED;
-                            line = " ";
+                            currentPlayer = line.equals("B") ? PlayerColor.BLUE : PlayerColor.RED;
+                            break;
                         }else if (match(line)) {
                             matchCapture(line);
                         } else {
                             matchMove(line);
                         }
-                        if (!line.equals(" ")) {
-                            stringWriter.append(line).append("\n");
+                        stringWriter.append(line).append("\n");
+                        try {
+                            Thread.sleep(400);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
                     bufferedReader.close();
@@ -211,7 +210,6 @@ public class GameController implements GameListener {
         model.moveChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
         swapColor();
-        animation();
     }
 
     private void matchCapture(String str) {
@@ -234,7 +232,6 @@ public class GameController implements GameListener {
         model.captureChessPiece(srcPoint, destPoint);
         view.setChessComponentAtGrid(destPoint, chess);
         swapColor();
-        animation();
     }
 
     // after a valid move swap the player
@@ -247,6 +244,7 @@ public class GameController implements GameListener {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                view.repaint();
                 round = stringWriter.toString().split("\n").length * 0.5 + 1;
                 roundText.setText(String.valueOf((int) round));
                 roundText.setForeground(currentPlayer.getColor());
