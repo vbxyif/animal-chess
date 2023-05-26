@@ -49,8 +49,10 @@ public class ChessGameFrame extends JFrame {
     public void setChessboardComponent(ChessboardComponent chessboardComponent) {
         ChessGameFrame.chessboardComponent = chessboardComponent;
     }
-    /**在面板中添加背景
-     * */
+
+    /**
+     * 在面板中添加背景
+     */
     private void addBackground() {
         ImageIcon bgp = new ImageIcon("src/animals/background.jpg");
         JLabel bgl = new JLabel(bgp);
@@ -112,7 +114,9 @@ public class ChessGameFrame extends JFrame {
         dialog.add(saveButton, BorderLayout.EAST);
     }
 
-    /**Create a button named saveButton*/
+    /**
+     * Create a button named saveButton
+     */
     private void addSaveButton() {
         //*Create a button named saveButton*//
         JButton saveButton = new JButton("保存");
@@ -200,9 +204,11 @@ public class ChessGameFrame extends JFrame {
         dialog.add(buttonPane, BorderLayout.SOUTH);
         dialog.setVisible(true);
     }
-    /**create a button named loadButton
+
+    /**
+     * create a button named loadButton
      * click the button to load
-     * */
+     */
     private void addLoadButton() {
         JButton loadButton = new JButton("加载");
         loadButton.addActionListener(e -> addLoadDialog());
@@ -211,9 +217,11 @@ public class ChessGameFrame extends JFrame {
         loadButton.setFont(new Font("Rockwell", Font.BOLD, 20));
         this.getLayeredPane().add(loadButton, JLayeredPane.MODAL_LAYER);
     }
-    /**create a button named undoButton
+
+    /**
+     * create a button named undoButton
      * click the button to undo
-     * */
+     */
     private void addUndoButton() {
         JButton undoButton = new JButton("悔棋");
         undoButton.addActionListener(e -> {
@@ -235,9 +243,10 @@ public class ChessGameFrame extends JFrame {
         this.getLayeredPane().add(undoButton, JLayeredPane.MODAL_LAYER);
     }
 
-    /**create a button named ruleButton
+    /**
+     * create a button named ruleButton
      * click the button to open the rule
-     * */
+     */
     private void addRuleButton() {
         JButton ruleButton = new JButton("规则");
         ruleButton.addActionListener(e -> {
@@ -291,7 +300,7 @@ public class ChessGameFrame extends JFrame {
 
     /**
      * 在游戏面板中增加一个按钮，如果按下的话就退出
-     * */
+     */
     private void addExitButton() {
         JButton exitButton = new JButton("退出");
         exitButton.addActionListener((e) -> {

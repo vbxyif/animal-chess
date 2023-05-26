@@ -285,12 +285,7 @@ public class GameController implements GameListener {
         } catch (IOException | UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                clip.start();
-            }
-        }).start();
+        new Thread(clip::start).start();
     }
 
     private void writeOperate(ChessboardPoint src, ChessboardPoint dest) throws IOException {
@@ -317,6 +312,24 @@ public class GameController implements GameListener {
         }
     }
 
+    private void setInvalidMove() {
+        for (CellComponent[] cells : view.getGridComponents()) {
+            for (CellComponent cell : cells) {
+                cell.setValidMove(false);
+            }
+        }
+    }
+
+    private void setValidMove(ChessboardPoint point) {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 7; j++) {
+                ChessboardPoint point1 = new ChessboardPoint(i, j);
+                if (model.isValidMove(point, point1) && model.isValidCapture(point, point1)) {
+                    view.getGridComponentAt(point1).setValidMove(true);
+                }
+            }
+        }
+    }
     // click an empty cell
     @Override
     public void onPlayerClickCell(ChessboardPoint point, CellComponent component) {
@@ -328,11 +341,7 @@ public class GameController implements GameListener {
                 throw new RuntimeException(e);
             }
             selectedPoint = null;
-            for (CellComponent[] cells : view.getGridComponents()) {
-                for (CellComponent cell : cells) {
-                    cell.setValidMove(false);
-                }
-            }
+            setInvalidMove();
             view.repaint();
             if (win(point)) {
                 afterWin();
@@ -344,30 +353,20 @@ public class GameController implements GameListener {
     }
 
 
+
     // click a cell with a chess
     @Override
     public void onPlayerClickChessPiece(ChessboardPoint point, ChessComponent component) {
         if (selectedPoint == null) {
             if (model.getChessPieceOwner(point).equals(currentPlayer)) {
                 selectedPoint = point;
-                for (int i = 0; i < 9; i++) {
-                    for (int j = 0; j < 7; j++) {
-                        ChessboardPoint point1 = new ChessboardPoint(i, j);
-                        if (model.isValidMove(point, point1) && model.isValidCapture(point, point1)) {
-                            view.getGridComponentAt(point1).setValidMove(true);
-                        }
-                    }
-                }
+                setValidMove(point);
                 component.setSelected(true);
                 view.repaint();
             }
         } else if (selectedPoint.equals(point)) {
             selectedPoint = null;
-            for (CellComponent[] cells : view.getGridComponents()) {
-                for (CellComponent cell : cells) {
-                    cell.setValidMove(false);
-                }
-            }
+            setInvalidMove();
             component.setSelected(false);
             view.repaint();
         } else if (!model.getChessPieceOwner(point).equals(currentPlayer)) {
@@ -379,12 +378,7 @@ public class GameController implements GameListener {
                     throw new RuntimeException(e);
                 }
                 selectedPoint = null;
-                for (CellComponent[] cells : view.getGridComponents()) {
-                    for (CellComponent cell : cells) {
-                        cell.setValidMove(false);
-                    }
-                }
-
+                setInvalidMove();
                 view.repaint();
                 if (win(point)) {
                     afterWin();
