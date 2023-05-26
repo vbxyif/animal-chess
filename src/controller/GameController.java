@@ -51,7 +51,7 @@ public class GameController implements GameListener {
         this.currentPlayer = PlayerColor.BLUE;
         round = stringWriter.toString().split("\n").length * 0.5 + 1;
         this.roundText = new MessageText(String.valueOf((int) round), currentPlayer.getColor());
-        setBackgroundClip("background");
+        setBackgroundClip();
         backgroundClip.loop(Clip.LOOP_CONTINUOUSLY);
         view.registerController(this);
         try {
@@ -62,10 +62,10 @@ public class GameController implements GameListener {
         view.repaint();
     }
 
-    private void setBackgroundClip(String str) {
+    private void setBackgroundClip() {
         try {
             backgroundClip = AudioSystem.getClip();
-            backgroundClip.open(AudioSystem.getAudioInputStream(new File("src/wav/" + str + ".wav")));
+            backgroundClip.open(AudioSystem.getAudioInputStream(new File("src/wav/" + "background" + ".wav")));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -96,8 +96,6 @@ public class GameController implements GameListener {
             System.out.println(line);
             if (line.equals(lines[lines.length - 1])) {
                 break;
-            } else if (line.matches("\\d+.\\d")) {
-                continue;
             } else if (match(line)) {
                 matchCapture(line);
             } else {
