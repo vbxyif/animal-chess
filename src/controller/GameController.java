@@ -134,38 +134,35 @@ public class GameController implements GameListener {
         File newGameFile = new File(str);
         savesFileReader = new FileReader(newGameFile);
         BufferedReader bufferedReader = new BufferedReader(savesFileReader);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    for (String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine()) {
-                        changeText();
-                        if (line.matches("\\d+.\\d")) {
-                            round = Double.parseDouble(line);
-                            continue;
-                        } else if(line.matches("\\D")){
-                            currentPlayer = line.equals("B") ? PlayerColor.BLUE : PlayerColor.RED;
-                            break;
-                        }else if (match(line)) {
-                            matchCapture(line);
-                        } else {
-                            matchMove(line);
-                        }
-                        stringWriter.append(line).append("\n");
-                        try {
-                            Thread.sleep(400);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+        new Thread(() -> {
+            try {
+                for (String line = bufferedReader.readLine(); line != null; line = bufferedReader.readLine()) {
+                    changeText();
+                    if (line.matches("\\d+.\\d")) {
+                        round = Double.parseDouble(line);
+                        continue;
+                    } else if(line.matches("\\D")){
+                        currentPlayer = line.equals("B") ? PlayerColor.BLUE : PlayerColor.RED;
+                        break;
+                    }else if (match(line)) {
+                        matchCapture(line);
+                    } else {
+                        matchMove(line);
                     }
-                    bufferedReader.close();
-                    savesFileReader.close();
-                    JOptionPane.showMessageDialog(null, "加载成功");
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    stringWriter.append(line).append("\n");
+                    try {
+                        Thread.sleep(400);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+                bufferedReader.close();
+                savesFileReader.close();
+                JOptionPane.showMessageDialog(null, "加载成功");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } ).start();
+        }).start();
         /*roundText.setText(String.valueOf((int) round));
         roundText.setForeground(currentPlayer.getColor());*/
         view.repaint();
@@ -253,14 +250,11 @@ public class GameController implements GameListener {
     }
 
     private void changeText() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                view.repaint();
-                round = stringWriter.toString().split("\n").length * 0.5 + 1;
-                roundText.setText(String.valueOf((int) round));
-                roundText.setForeground(currentPlayer.getColor());
-            }
+        SwingUtilities.invokeLater(() -> {
+            view.repaint();
+            round = stringWriter.toString().split("\n").length * 0.5 + 1;
+            roundText.setText(String.valueOf((int) round));
+            roundText.setForeground(currentPlayer.getColor());
         });
     }
 
